@@ -3,6 +3,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import PrivateRoute from './components/layout/PrivateRoute'
 import Layout from './components/layout/Layout'
 import LoginPage from './pages/auth/LoginPage'
+import RegisterPage from './pages/auth/RegisterPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import ClientesPage from './pages/clientes/ClientesPage'
 import ObrasPage from './pages/obras/ObrasPage'
@@ -29,6 +30,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/*" element={
         <PrivateRoute>
