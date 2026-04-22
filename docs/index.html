@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ERP MAGMO — Visão Geral do Sistema</title>
+<style>
+  :root {
+    --bg: #0f1729;
+    --bg2: #1a2540;
+    --orange: #f97316;
+    --orange2: #ea6c0a;
+    --green: #22c55e;
+    --red: #ef4444;
+    --purple: #8b5cf6;
+    --blue: #3b82f6;
+    --yellow: #f59e0b;
+    --pink: #ec4899;
+    --text: #f1f5f9;
+    --text2: #94a3b8;
+    --border: rgba(255,255,255,0.08);
+    --card: rgba(255,255,255,0.04);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #0f1729 0%, #1a2a50 50%, #0f1729 100%);
+    padding: 70px 40px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(249,115,22,.18) 0%, transparent 65%);
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(249,115,22,.15); border: 1px solid rgba(249,115,22,.3);
+    color: var(--orange); padding: 6px 16px; border-radius: 99px;
+    font-size: 12px; font-weight: 700; letter-spacing: .8px;
+    text-transform: uppercase; margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 800;
+    line-height: 1.1; margin-bottom: 16px; position: relative;
+  }
+  .hero h1 span { color: var(--orange); }
+  .hero p {
+    font-size: 1.1rem; color: var(--text2); max-width: 600px;
+    margin: 0 auto 32px; position: relative;
+  }
+  .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px; border-radius: 10px; font-weight: 700;
+    font-size: 14px; text-decoration: none; cursor: pointer;
+    border: none; transition: all .2s;
+  }
+  .btn-primary { background: var(--orange); color: #fff; }
+  .btn-primary:hover { background: var(--orange2); transform: translateY(-1px); }
+  .btn-outline {
+    background: transparent; color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover { border-color: var(--orange); color: var(--orange); }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px; background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat-item {
+    background: var(--bg2); padding: 20px 32px; text-align: center;
+  }
+  .stat-item .num {
+    font-size: 2rem; font-weight: 800; color: var(--orange);
+  }
+  .stat-item .lbl { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  /* ── SECTION ── */
+  .section { padding: 60px 40px; max-width: 1300px; margin: 0 auto; }
+  .section-title {
+    font-size: 1.6rem; font-weight: 800; margin-bottom: 8px;
+  }
+  .section-sub { color: var(--text2); font-size: 14px; margin-bottom: 40px; }
+  .sep { width: 48px; height: 3px; background: var(--orange); border-radius: 2px; margin: 12px 0 40px; }
+
+  /* ── MODULOS GRID ── */
+  .modulos-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .modulo-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; transition: all .2s;
+    cursor: default;
+  }
+  .modulo-card:hover {
+    border-color: rgba(249,115,22,.4); background: rgba(249,115,22,.06);
+    transform: translateY(-3px);
+  }
+  .modulo-icon {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 16px;
+  }
+  .modulo-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .modulo-card p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .modulo-status {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 700; padding: 3px 10px;
+    border-radius: 99px; margin-top: 14px;
+  }
+  .status-ok { background: rgba(34,197,94,.15); color: var(--green); }
+  .status-wip { background: rgba(249,115,22,.15); color: var(--orange); }
+
+  /* ── FLUXO FINANCEIRO ── */
+  .fluxo-section { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 60px 40px; }
+  .fluxo-inner { max-width: 1300px; margin: 0 auto; }
+  .fluxo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 0;
+    position: relative;
+    align-items: start;
+    margin-top: 40px;
+  }
+  .fluxo-col {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    position: relative;
+  }
+  .fluxo-col::after {
+    content: '→';
+    position: absolute; right: -16px; top: 50px;
+    font-size: 22px; color: var(--text2); pointer-events: none;
+  }
+  .fluxo-col:last-child::after { display: none; }
+  .fluxo-header {
+    width: 100%; text-align: center; padding: 12px 8px;
+    border-radius: 12px 12px 0 0; font-size: 11px; font-weight: 800;
+    letter-spacing: .5px; text-transform: uppercase;
+  }
+  .fluxo-conta {
+    width: 100%; background: rgba(255,255,255,.05); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 12px; text-align: center;
+  }
+  .fluxo-conta .cnt-nome { font-size: 12px; font-weight: 700; }
+  .fluxo-conta .cnt-desc { font-size: 10px; color: var(--text2); margin-top: 3px; }
+  .fluxo-saidas { width: 100%; }
+  .saida-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--text2); padding: 5px 8px;
+    background: rgba(239,68,68,.06); border: 1px solid rgba(239,68,68,.15);
+    border-radius: 7px; margin-top: 5px;
+  }
+  .saida-item .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); flex-shrink: 0; }
+  .saida-item.green .dot { background: var(--green); }
+  .saida-item.green { background: rgba(34,197,94,.06); border-color: rgba(34,197,94,.15); }
+
+  /* ── SCHEMA TABLES ── */
+  .schema-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .schema-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+  }
+  .schema-card-head {
+    padding: 14px 18px; font-weight: 700; font-size: 13px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .schema-card-body { padding: 0 18px 14px; }
+  .col-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 12px;
+  }
+  .col-row:last-child { border-bottom: none; }
+  .col-name { color: var(--text); font-family: monospace; }
+  .col-type { color: var(--text2); font-size: 11px; }
+  .col-pk { color: var(--yellow); font-size: 10px; font-weight: 700; padding: 1px 6px; background: rgba(245,158,11,.15); border-radius: 4px; }
+  .col-fk { color: var(--blue); font-size: 10px; font-weight: 700; padding: 1px 6px; background: rgba(59,130,246,.15); border-radius: 4px; }
+  .col-trig { color: var(--green); font-size: 10px; font-weight: 700; padding: 1px 6px; background: rgba(34,197,94,.15); border-radius: 4px; }
+
+  /* ── TECH STACK ── */
+  .stack-grid {
+    display: flex; flex-wrap: wrap; gap: 12px;
+  }
+  .stack-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 18px;
+    display: flex; align-items: center; gap: 10px; font-size: 14px;
+  }
+  .stack-item .icon { font-size: 20px; }
+  .stack-item .name { font-weight: 700; }
+  .stack-item .ver { font-size: 11px; color: var(--text2); }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; padding-left: 36px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 12px; top: 8px; bottom: 8px;
+    width: 2px; background: linear-gradient(to bottom, var(--orange), transparent);
+    border-radius: 2px;
+  }
+  .tl-item { position: relative; margin-bottom: 28px; }
+  .tl-dot {
+    position: absolute; left: -30px; top: 4px;
+    width: 12px; height: 12px; border-radius: 50%;
+    border: 2px solid var(--orange); background: var(--bg);
+  }
+  .tl-dot.done { background: var(--orange); }
+  .tl-item h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .tl-item p { font-size: 13px; color: var(--text2); }
+  .tl-tag { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 700; margin-left: 8px; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; padding: 32px 20px;
+    border-top: 1px solid var(--border);
+    color: var(--text2); font-size: 13px;
+  }
+  footer a { color: var(--orange); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .stats-bar { grid-template-columns: repeat(2,1fr); }
+    .fluxo-grid { grid-template-columns: 1fr; }
+    .fluxo-col::after { display: none; }
+    .section { padding: 40px 20px; }
+    .hero { padding: 50px 20px 40px; }
+  }
+  @media (max-width: 500px) {
+    .stats-bar { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 32px; overflow-x: auto; }
+  .tab {
+    padding: 12px 20px; font-size: 14px; font-weight: 600;
+    cursor: pointer; color: var(--text2); border-bottom: 2px solid transparent;
+    white-space: nowrap; transition: all .2s;
+  }
+  .tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── MISC ── */
+  .tag {
+    display: inline-block; font-size: 11px; padding: 3px 10px;
+    border-radius: 99px; font-weight: 700;
+  }
+  .tag-green { background: rgba(34,197,94,.15); color: var(--green); }
+  .tag-blue { background: rgba(59,130,246,.15); color: var(--blue); }
+  .tag-orange { background: rgba(249,115,22,.15); color: var(--orange); }
+  .tag-purple { background: rgba(139,92,246,.15); color: var(--purple); }
+  .tag-yellow { background: rgba(245,158,11,.15); color: var(--yellow); }
+
+  .divider { height: 1px; background: var(--border); margin: 0 40px; }
+</style>
+</head>
+<body>
+
+<!-- ══ HERO ══════════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-badge">🏗 SaaS Multi-Tenant · v1.0</div>
+  <h1>ERP <span>MAGMO</span></h1>
+  <p>Sistema completo de gestão para construtoras e empreiteiros — obras, orçamentos, insumos e controle financeiro inteligente.</p>
+  <div class="hero-actions">
+    <a href="https://github.com/magmodrive-alt/erp-magmo" target="_blank" class="btn btn-primary">
+      ⬡ Ver no GitHub
+    </a>
+    <a href="#modulos" class="btn btn-outline">📦 Módulos</a>
+    <a href="#financeiro" class="btn btn-outline">💰 Fluxo Financeiro</a>
+    <a href="#schema" class="btn btn-outline">🗄 Schema SQL</a>
+  </div>
+</section>
+
+<!-- ══ STATS BAR ══════════════════════════════════════════════════════ -->
+<div class="stats-bar">
+  <div class="stat-item"><div class="num">18</div><div class="lbl">Tabelas no banco de dados</div></div>
+  <div class="stat-item"><div class="num">5</div><div class="lbl">Tipos de conta financeira</div></div>
+  <div class="stat-item"><div class="num">28</div><div class="lbl">Categorias de lançamento</div></div>
+  <div class="stat-item"><div class="num">100%</div><div class="lbl">RLS multi-tenant ativo</div></div>
+</div>
+
+<!-- ══ MÓDULOS ═══════════════════════════════════════════════════════ -->
+<section class="section" id="modulos">
+  <div class="section-title">📦 Módulos do Sistema</div>
+  <div class="sep"></div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('core')">Core</div>
+    <div class="tab" onclick="showTab('financeiro-tab')">Financeiro</div>
+    <div class="tab" onclick="showTab('obras-tab')">Obras</div>
+    <div class="tab" onclick="showTab('pendentes')">Em Desenvolvimento</div>
+  </div>
+
+  <!-- Core -->
+  <div class="tab-panel active" id="core">
+    <div class="modulos-grid">
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(249,115,22,.15)">🔐</div>
+        <h3>Auth Multi-Tenant</h3>
+        <p>Login por empresa. Cada usuário pertence a uma empresa e vê apenas os dados dela. Roles: superadmin, admin, gestor, engenheiro, financeiro, viewer.</p>
+        <div class="modulo-status status-ok">✓ Implementado</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(34,197,94,.15)">📊</div>
+        <h3>Dashboard</h3>
+        <p>Visão geral com cards de obras ativas, saldo gerencial, provisões, gráfico de fluxo de caixa (6 meses) e obras por status. Recharts integrado.</p>
+        <div class="modulo-status status-ok">✓ Implementado</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(59,130,246,.15)">👥</div>
+        <h3>Clientes</h3>
+        <p>Cadastro PF/PJ completo com CPF/CNPJ, endereço, contatos. Busca por trigram (pg_trgm). Modal de criação/edição.</p>
+        <div class="modulo-status status-ok">✓ Implementado</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(139,92,246,.15)">📦</div>
+        <h3>Banco de Insumos</h3>
+        <p>Base própria + bases públicas (SINAPI, FDE, ORSE, DEINFRA, EMOP). Filtro por fonte, categoria, código. Histórico de preços por mês de referência.</p>
+        <div class="modulo-status status-ok">✓ Implementado</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(245,158,11,.15)">🧩</div>
+        <h3>Composições</h3>
+        <p>Composições sempre baseadas em insumos. Trigger automático recalcula custo total ao adicionar/editar itens. Expandir linhas para ver ingredientes.</p>
+        <div class="modulo-status status-ok">✓ Implementado</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(236,72,153,.15)">📄</div>
+        <h3>Orçamentos</h3>
+        <p>WBS por grupos/etapas. Itens por composição ou insumo direto. BDI por item ou global. Trigger recalcula valor_custo, valor_bdi e valor_total.</p>
+        <div class="modulo-status status-ok">✓ Implementado</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Financeiro -->
+  <div class="tab-panel" id="financeiro-tab">
+    <div class="modulos-grid">
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(34,197,94,.15)">🏦</div>
+        <h3>Visão Geral Financeira</h3>
+        <p>Cards dos 5 tipos de conta, gráfico de barras horizontal com saldos por tipo. Últimos lançamentos do mês com receitas/despesas/provisões.</p>
+        <div class="modulo-status status-ok">✓ Implementado</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(59,130,246,.15)">💳</div>
+        <h3>Contas Financeiras</h3>
+        <p>Criação das 5 contas seguindo o fluxograma: Gerencial, Operacional (por obra), Fluxo Fixo, Provisões (subtipo) e Lucro Excedente.</p>
+        <div class="modulo-status status-ok">✓ Implementado</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(249,115,22,.15)">↔️</div>
+        <h3>Lançamentos</h3>
+        <p>Receitas, despesas, provisões e transferências. Filtros por mês, tipo, status. Confirmar pagamento atualiza saldo da conta via trigger SQL.</p>
+        <div class="modulo-status status-ok">✓ Implementado</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(139,92,246,.15)">⚡</div>
+        <h3>Provisões</h3>
+        <p>4 tipos: trabalhistas (INSS, FGTS, rescisões), tributárias (PIS, COFINS, CSLL, IRPJ, ISS), marketing (3,5%), lucro. Regras automáticas por percentual.</p>
+        <div class="modulo-status status-ok">✓ Implementado</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(245,158,11,.15)">📐</div>
+        <h3>Medições de Obra</h3>
+        <p>Medições periódicas vinculadas ao orçamento. Controle de % acumulado, valor medido e aprovação. Status: rascunho → enviada → aprovada → paga.</p>
+        <div class="modulo-status status-wip">⚙ Em breve</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Obras -->
+  <div class="tab-panel" id="obras-tab">
+    <div class="modulos-grid">
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(249,115,22,.15)">🏗</div>
+        <h3>Gestão de Obras</h3>
+        <p>7 status de ciclo de vida: prospecção → orçamento → contratada → em andamento → paralisada → concluída → cancelada. Visualização cards ou tabela.</p>
+        <div class="modulo-status status-ok">✓ Implementado</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(34,197,94,.15)">📓</div>
+        <h3>Diário de Obras</h3>
+        <p>Registro diário com data, clima, nº de funcionários, % de execução e fotos. Histórico completo de ocorrências da obra.</p>
+        <div class="modulo-status status-ok">✓ Schema · UI em breve</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(59,130,246,.15)">📎</div>
+        <h3>Documentos</h3>
+        <p>Anexos por obra: contratos, plantas, ARO, NF, fotos. Upload via Supabase Storage (bucket: obras-documentos). Signed URLs para acesso seguro.</p>
+        <div class="modulo-status status-ok">✓ Schema · UI em breve</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(245,158,11,.15)">👷</div>
+        <h3>Equipe da Obra</h3>
+        <p>Alocação de usuários do sistema ou colaboradores externos. Controle de entrada/saída por período em cada obra.</p>
+        <div class="modulo-status status-ok">✓ Schema · UI em breve</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon" style="background:rgba(139,92,246,.15)">📃</div>
+        <h3>Contratos</h3>
+        <p>Contratos vinculados a obra + orçamento + cliente. Tipos: obra, serviço, fornecimento, manutenção. Histórico de status e arquivo PDF.</p>
+        <div class="modulo-status status-ok">✓ Schema · UI em breve</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pendentes -->
+  <div class="tab-panel" id="pendentes">
+    <div class="modulos-grid">
+      <div class="modulo-card" style="border-color:rgba(249,115,22,.2)">
+        <div class="modulo-icon" style="background:rgba(249,115,22,.1)">📊</div>
+        <h3>Relatórios</h3>
+        <p>DRE por obra, fluxo de caixa mensal, comparativo orçado vs realizado, curva S de execução, rentabilidade por obra.</p>
+        <div class="modulo-status status-wip">⚙ Em desenvolvimento</div>
+      </div>
+      <div class="modulo-card" style="border-color:rgba(249,115,22,.2)">
+        <div class="modulo-icon" style="background:rgba(249,115,22,.1)">📬</div>
+        <h3>Fornecedores</h3>
+        <p>CRUD completo PF/PJ. Categorias: materiais, serviços, equipamentos. Vinculação a lançamentos de despesas.</p>
+        <div class="modulo-status status-wip">⚙ Em desenvolvimento</div>
+      </div>
+      <div class="modulo-card" style="border-color:rgba(249,115,22,.2)">
+        <div class="modulo-icon" style="background:rgba(249,115,22,.1)">⚙</div>
+        <h3>Configurações</h3>
+        <p>Dados da empresa, logo, plano, regras de provisão padrão, usuários e permissões, integração com bases SINAPI/FDE.</p>
+        <div class="modulo-status status-wip">⚙ Em desenvolvimento</div>
+      </div>
+      <div class="modulo-card" style="border-color:rgba(249,115,22,.2)">
+        <div class="modulo-icon" style="background:rgba(249,115,22,.1)">🏢</div>
+        <h3>Multi-Empresa (SaaS)</h3>
+        <p>Cadastro público de nova empresa, planos (free/starter/pro/enterprise), billing, isolamento total de dados por tenant.</p>
+        <div class="modulo-status status-wip">⚙ Em desenvolvimento</div>
+      </div>
+      <div class="modulo-card" style="border-color:rgba(249,115,22,.2)">
+        <div class="modulo-icon" style="background:rgba(249,115,22,.1)">📱</div>
+        <h3>PWA / Mobile</h3>
+        <p>Versão mobile para engenheiros em campo: diário de obras, fotos, % execução, lançamentos rápidos.</p>
+        <div class="modulo-status status-wip">⚙ Planejado</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FLUXO FINANCEIRO ═══════════════════════════════════════════════ -->
+<section class="fluxo-section" id="financeiro">
+  <div class="fluxo-inner">
+    <div class="section-title">💰 Estrutura Financeira — Fluxograma</div>
+    <p style="color:var(--text2);font-size:14px;margin-top:8px">Baseada no fluxograma da MAGMO: segregação por obra, provisões automáticas e controle do lucro excedente</p>
+    <div class="sep"></div>
+
+    <div class="fluxo-grid">
+
+      <!-- OPERACIONAL -->
+      <div class="fluxo-col">
+        <div class="fluxo-header" style="background:rgba(249,115,22,.2);color:#fb923c">🧱 Conta Operacional</div>
+        <div class="fluxo-conta"><div class="cnt-nome">C.O — OBRA 1</div><div class="cnt-desc">Conta por obra</div></div>
+        <div class="fluxo-conta"><div class="cnt-nome">C.O — OBRA 2</div><div class="cnt-desc">Conta por obra</div></div>
+        <div class="fluxo-conta"><div class="cnt-nome">C.O — OBRA N</div><div class="cnt-desc">Conta por obra</div></div>
+        <div class="fluxo-saidas" style="margin-top:8px">
+          <div style="font-size:10px;color:var(--text2);margin-bottom:4px;font-weight:700">SAÍDAS DIRETAS</div>
+          <div class="saida-item"><div class="dot"></div>Coord. Obra</div>
+          <div class="saida-item"><div class="dot"></div>Mão de Obra</div>
+          <div class="saida-item"><div class="dot"></div>Materiais</div>
+          <div class="saida-item"><div class="dot"></div>Equipamentos</div>
+          <div class="saida-item"><div class="dot"></div>EPI / Encargos</div>
+          <div class="saida-item"><div class="dot"></div>Benefícios</div>
+        </div>
+      </div>
+
+      <!-- GERENCIAL -->
+      <div class="fluxo-col">
+        <div class="fluxo-header" style="background:rgba(34,197,94,.2);color:#4ade80">🏦 Conta Gerencial</div>
+        <div class="fluxo-conta" style="border-color:rgba(34,197,94,.3)">
+          <div class="cnt-nome" style="color:#4ade80">GERENCIAL ITAÚ</div>
+          <div class="cnt-desc">Hub financeiro central</div>
+        </div>
+        <div class="fluxo-conta"><div class="cnt-nome">Resultado Obra 1</div></div>
+        <div class="fluxo-conta"><div class="cnt-nome">Resultado Obra 2</div></div>
+        <div class="fluxo-conta"><div class="cnt-nome">Resultado Obra N</div></div>
+        <div class="fluxo-saidas" style="margin-top:8px">
+          <div style="font-size:10px;color:var(--text2);margin-bottom:4px;font-weight:700">DISTRIBUI PARA</div>
+          <div class="saida-item green"><div class="dot"></div>→ Fluxo Fixo</div>
+          <div class="saida-item green"><div class="dot"></div>→ Provisões</div>
+          <div class="saida-item green"><div class="dot"></div>→ Lucro Excedente</div>
+        </div>
+      </div>
+
+      <!-- FLUXO FIXO -->
+      <div class="fluxo-col">
+        <div class="fluxo-header" style="background:rgba(245,158,11,.2);color:#fbbf24">🏢 Fluxo Fixo</div>
+        <div class="fluxo-conta"><div class="cnt-nome">Caixa Empresa</div><div class="cnt-desc">Despesas administrativas</div></div>
+        <div class="fluxo-saidas" style="margin-top:8px">
+          <div style="font-size:10px;color:var(--text2);margin-bottom:4px;font-weight:700">SAÍDAS FIXAS</div>
+          <div class="saida-item"><div class="dot"></div>Despesas Escritório</div>
+          <div class="saida-item"><div class="dot"></div>Jurídico / Contab.</div>
+          <div class="saida-item"><div class="dot"></div>Aquisições</div>
+          <div class="saida-item"><div class="dot"></div>Manutenção</div>
+        </div>
+      </div>
+
+      <!-- PROVISÕES -->
+      <div class="fluxo-col">
+        <div class="fluxo-header" style="background:rgba(139,92,246,.2);color:#a78bfa">⚡ Provisões</div>
+        <div class="fluxo-conta"><div class="cnt-nome">C.P — Lucro</div></div>
+        <div class="fluxo-conta"><div class="cnt-nome">C.P — Marketing 3,5%</div><div class="cnt-desc">C.D.E + C.A.C</div></div>
+        <div class="fluxo-conta"><div class="cnt-nome">C.P — Trabalhistas</div><div class="cnt-desc">INSS · FGTS · Rescisão</div></div>
+        <div class="fluxo-conta"><div class="cnt-nome">C.P — Tributárias</div><div class="cnt-desc">PIS · COFINS · CSLL · IRPJ · ISS</div></div>
+      </div>
+
+      <!-- LUCRO EXCEDENTE -->
+      <div class="fluxo-col">
+        <div class="fluxo-header" style="background:rgba(236,72,153,.2);color:#f472b6">💎 Lucro Excedente</div>
+        <div class="fluxo-conta"><div class="cnt-nome">Caixa</div></div>
+        <div class="fluxo-conta"><div class="cnt-nome">C.D.E</div></div>
+        <div class="fluxo-conta"><div class="cnt-nome">C.A.C</div></div>
+        <div class="fluxo-saidas" style="margin-top:8px">
+          <div style="font-size:10px;color:var(--text2);margin-bottom:4px;font-weight:700">DESTINOS</div>
+          <div class="saida-item green"><div class="dot"></div>Bonificações</div>
+          <div class="saida-item green"><div class="dot"></div>Premiações</div>
+          <div class="saida-item green"><div class="dot"></div>Lucro Distribuído</div>
+          <div class="saida-item green"><div class="dot"></div>Educação / Equip.</div>
+          <div class="saida-item green"><div class="dot"></div>Investimentos</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ SCHEMA SQL ════════════════════════════════════════════════════ -->
+<section class="section" id="schema">
+  <div class="section-title">🗄 Schema do Banco de Dados</div>
+  <p style="color:var(--text2);font-size:14px;margin-top:4px">PostgreSQL (Supabase) · 18 tabelas · 3 triggers · RLS em todas</p>
+  <div class="sep"></div>
+
+  <div class="schema-grid">
+
+    <div class="schema-card">
+      <div class="schema-card-head" style="background:rgba(249,115,22,.1);color:#fb923c">
+        🏢 empresas
+        <span class="tag tag-orange" style="margin-left:auto;font-size:10px">multi-tenant</span>
+      </div>
+      <div class="schema-card-body">
+        <div class="col-row"><span class="col-name">id</span><div><span class="col-pk">PK</span></div></div>
+        <div class="col-row"><span class="col-name">nome, cnpj, razao_social</span><span class="col-type">TEXT</span></div>
+        <div class="col-row"><span class="col-name">plano</span><span class="col-type">free|starter|pro|enterprise</span></div>
+        <div class="col-row"><span class="col-name">email, telefone, endereco</span><span class="col-type">TEXT</span></div>
+        <div class="col-row"><span class="col-name">logo_url, ativo</span><span class="col-type">TEXT / BOOL</span></div>
+      </div>
+    </div>
+
+    <div class="schema-card">
+      <div class="schema-card-head" style="background:rgba(59,130,246,.1);color:#60a5fa">👤 perfis</div>
+      <div class="schema-card-body">
+        <div class="col-row"><span class="col-name">id</span><div><span class="col-pk">PK</span> <span class="col-fk">→ auth.users</span></div></div>
+        <div class="col-row"><span class="col-name">empresa_id</span><span class="col-fk">FK</span></div>
+        <div class="col-row"><span class="col-name">role</span><span class="col-type">admin|gestor|engenheiro|financeiro|viewer</span></div>
+        <div class="col-row"><span class="col-name">nome, email, cargo</span><span class="col-type">TEXT</span></div>
+      </div>
+    </div>
+
+    <div class="schema-card">
+      <div class="schema-card-head" style="background:rgba(139,92,246,.1);color:#a78bfa">📦 insumos</div>
+      <div class="schema-card-body">
+        <div class="col-row"><span class="col-name">empresa_id</span><div><span class="col-fk">FK nullable</span></div></div>
+        <div class="col-row"><span class="col-name">codigo, descricao, unidade</span><span class="col-type">TEXT</span></div>
+        <div class="col-row"><span class="col-name">fonte</span><span class="col-type">sinapi|fde|orse|proprio…</span></div>
+        <div class="col-row"><span class="col-name">preco_unitario</span><span class="col-type">NUMERIC(15,4)</span></div>
+        <div class="col-row"><span class="col-name">referencia_mes, estado_ref</span><span class="col-type">DATE / CHAR(2)</span></div>
+        <div class="col-row"><span class="col-name">desonerado</span><span class="col-type">BOOLEAN</span></div>
+      </div>
+    </div>
+
+    <div class="schema-card">
+      <div class="schema-card-head" style="background:rgba(245,158,11,.1);color:#fbbf24">
+        🧩 composicoes
+        <span class="col-trig" style="margin-left:auto">TRIGGER</span>
+      </div>
+      <div class="schema-card-body">
+        <div class="col-row"><span class="col-name">descricao, unidade, codigo</span><span class="col-type">TEXT</span></div>
+        <div class="col-row"><span class="col-name">custo_total</span><div><span class="col-trig">AUTO</span> <span class="col-type">NUMERIC</span></div></div>
+        <div class="col-row"><span class="col-name">bdi_padrao</span><span class="col-type">NUMERIC(5,2)</span></div>
+        <div class="col-row" style="color:var(--text2);font-size:11px;padding-top:8px">
+          ↳ composicoes_itens: insumo_id + qtd + preço → subtotal GENERATED
+        </div>
+      </div>
+    </div>
+
+    <div class="schema-card">
+      <div class="schema-card-head" style="background:rgba(249,115,22,.1);color:#fb923c">🏗 obras</div>
+      <div class="schema-card-body">
+        <div class="col-row"><span class="col-name">status</span><span class="col-type">prospeccao→concluida</span></div>
+        <div class="col-row"><span class="col-name">valor_contrato</span><span class="col-type">NUMERIC(15,2)</span></div>
+        <div class="col-row"><span class="col-name">percentual_exec</span><span class="col-type">NUMERIC(5,2)</span></div>
+        <div class="col-row"><span class="col-name">area_total, tipo</span><span class="col-type">NUMERIC / TEXT</span></div>
+        <div class="col-row" style="color:var(--text2);font-size:11px;padding-top:8px">
+          ↳ obras_diario · obras_equipe · obras_documentos
+        </div>
+      </div>
+    </div>
+
+    <div class="schema-card">
+      <div class="schema-card-head" style="background:rgba(34,197,94,.1);color:#4ade80">
+        📄 orcamentos
+        <span class="col-trig" style="margin-left:auto">TRIGGER</span>
+      </div>
+      <div class="schema-card-body">
+        <div class="col-row"><span class="col-name">status</span><span class="col-type">rascunho→aprovado</span></div>
+        <div class="col-row"><span class="col-name">bdi, desconto</span><span class="col-type">NUMERIC(5,2)</span></div>
+        <div class="col-row"><span class="col-name">valor_custo / valor_bdi / valor_total</span><div><span class="col-trig">AUTO</span></div></div>
+        <div class="col-row" style="color:var(--text2);font-size:11px;padding-top:8px">
+          ↳ orcamentos_grupos (WBS hierárquico) <br>↳ orcamentos_itens (composição|insumo|serviço)
+        </div>
+      </div>
+    </div>
+
+    <div class="schema-card">
+      <div class="schema-card-head" style="background:rgba(59,130,246,.1);color:#60a5fa">
+        💳 contas_financeiras
+      </div>
+      <div class="schema-card-body">
+        <div class="col-row"><span class="col-name">tipo</span><span class="col-type">gerencial|operacional|fluxo_fixo|provisao|lucro_excedente|caixa</span></div>
+        <div class="col-row"><span class="col-name">subtipo</span><span class="col-type">lucro|marketing|trabalhistas|tributarias</span></div>
+        <div class="col-row"><span class="col-name">saldo_inicial / saldo_atual</span><span class="col-type">NUMERIC(15,2)</span></div>
+        <div class="col-row"><span class="col-name">obra_id</span><span class="col-fk">FK opcional</span></div>
+      </div>
+    </div>
+
+    <div class="schema-card">
+      <div class="schema-card-head" style="background:rgba(139,92,246,.1);color:#a78bfa">
+        ↔️ lancamentos
+        <span class="col-trig" style="margin-left:auto">TRIGGER</span>
+      </div>
+      <div class="schema-card-body">
+        <div class="col-row"><span class="col-name">tipo</span><span class="col-type">receita|despesa|transferencia|provisao</span></div>
+        <div class="col-row"><span class="col-name">status</span><span class="col-type">pendente|pago|recebido|atrasado|cancelado</span></div>
+        <div class="col-row"><span class="col-name">valor</span><span class="col-type">NUMERIC(15,2)</span></div>
+        <div class="col-row"><span class="col-name">conta_id / conta_destino_id</span><span class="col-fk">FK</span></div>
+        <div class="col-row" style="color:var(--text2);font-size:11px;padding-top:8px">
+          ↳ Trigger atualiza saldo_atual ao pagar/cancelar
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ TECH STACK ════════════════════════════════════════════════════ -->
+<div class="divider"></div>
+<section class="section" id="stack">
+  <div class="section-title">⚡ Tech Stack</div>
+  <div class="sep"></div>
+  <div class="stack-grid">
+    <div class="stack-item"><span class="icon">⚛️</span><div><div class="name">React 18</div><div class="ver">+ TypeScript</div></div></div>
+    <div class="stack-item"><span class="icon">⚡</span><div><div class="name">Vite 6</div><div class="ver">Build tool</div></div></div>
+    <div class="stack-item"><span class="icon">🎨</span><div><div class="name">Tailwind CSS 3</div><div class="ver">Utility-first</div></div></div>
+    <div class="stack-item"><span class="icon">🗄</span><div><div class="name">Supabase</div><div class="ver">PostgreSQL + Auth + Storage</div></div></div>
+    <div class="stack-item"><span class="icon">📊</span><div><div class="name">Recharts</div><div class="ver">Gráficos interativos</div></div></div>
+    <div class="stack-item"><span class="icon">🔀</span><div><div class="name">React Router v7</div><div class="ver">Roteamento SPA</div></div></div>
+    <div class="stack-item"><span class="icon">✅</span><div><div class="name">Zod + React Hook Form</div><div class="ver">Validação de formulários</div></div></div>
+    <div class="stack-item"><span class="icon">🧩</span><div><div class="name">Lucide React</div><div class="ver">Ícones</div></div></div>
+  </div>
+</section>
+
+<!-- ══ ROADMAP ════════════════════════════════════════════════════════ -->
+<div class="divider"></div>
+<section class="section">
+  <div class="section-title">🗺 Roadmap</div>
+  <div class="sep"></div>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot done"></div>
+      <h4>v1.0 — Foundation <span class="tl-tag" style="background:rgba(34,197,94,.15);color:var(--green)">✓ Concluído</span></h4>
+      <p>Schema SQL completo, Auth multi-tenant, Dashboard, Clientes, Insumos, Composições, Obras, Orçamentos, Financeiro (5 contas + lançamentos + provisões)</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <h4>v1.1 — Gestão de Obras Completa <span class="tl-tag" style="background:rgba(249,115,22,.15);color:var(--orange)">Próximo</span></h4>
+      <p>Detalhe da obra com diário, equipe, documentos. Novo orçamento com WBS interativo. Fornecedores CRUD.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <h4>v1.2 — Medições e Contratos</h4>
+      <p>Módulo de medições vinculado ao orçamento. Geração de contratos PDF. Curva S de execução física × financeira.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <h4>v1.3 — Relatórios e DRE</h4>
+      <p>DRE por obra, fluxo de caixa projetado, comparativo orçado × realizado, relatório de provisões e margem líquida.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <h4>v2.0 — SaaS Público</h4>
+      <p>Cadastro de novas empresas, planos e billing, portal de administração global, importação automática de SINAPI mensal.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ════════════════════════════════════════════════════════ -->
+<footer>
+  <p>ERP MAGMO — Desenvolvido com ❤️ para construtoras brasileiras</p>
+  <p style="margin-top:8px">
+    <a href="https://github.com/magmodrive-alt/erp-magmo" target="_blank">⬡ GitHub</a>
+    &nbsp;·&nbsp;
+    <span>Supabase Project: orcclbqyzxrahpdpljmp</span>
+    &nbsp;·&nbsp;
+    <span>Stack: React + TypeScript + Vite + Tailwind + Supabase</span>
+  </p>
+</footer>
+
+<script>
+  function showTab(id) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+</body>
+</html>
