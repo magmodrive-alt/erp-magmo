@@ -39,6 +39,14 @@ CREATE TABLE IF NOT EXISTS planos (
 INSERT INTO planos (nome, slug, descricao, valor_mensal, valor_anual_avista, valor_anual_12x, valor_anual_6x, desconto_avista_pct, max_obras, max_usuarios, max_orcamentos, max_insumos, features, trial_dias, destaque, ordem)
 VALUES
   (
+    'Trial', 'trial',
+    'Experimente grátis — até 2 obras, sem cartão de crédito',
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    2, 1, 5, 50,
+    '["Dashboard básico","Até 2 obras","1 usuário","Orçamentos (5)","Insumos limitados (50)","Sem suporte dedicado","Válido por 14 dias"]',
+    14, FALSE, 0
+  ),
+  (
     'Starter', 'starter',
     'Ideal para construtoras pequenas e autônomos',
     97.00, 797.00, 87.00, 91.00, 23.5,
@@ -594,6 +602,122 @@ ALTER TABLE empresas
   ADD COLUMN IF NOT EXISTS trial_fim      DATE,
   ADD COLUMN IF NOT EXISTS bloqueada      BOOLEAN DEFAULT FALSE,
   ADD COLUMN IF NOT EXISTS motivo_bloqueio TEXT;
+
+-- ─────────────────────────────────────────────────────────────
+-- 14. CONTROLE DE LIMITE DE OBRAS POR PLANO (Trial = 2 obras)
+-- ─────────────────────────────────────────────────────────────
+
+-- Função: verifica se empresa pode criar mais obras
+CREATE OR REPLACE FUNCTION fn_verificar_limite_obras(p_empresa_id UUID)
+RETURNS JSONB LANGUAGE plpgsql AS $$
+DECLARE
+  v_plano_slug    TEXT;
+  v_max_obras     INT;
+  v_obras_ativas  INT;
+  v_bloqueada     BOOLEAN;
+BEGIN
+  -- Busca plano atual da empresa via assinatura ativa
+  SELECT p.slug, p.max_obras
+  INTO v_plano_slug, v_max_obras
+  FROM assinaturas a
+  JOIN planos p ON p.id = a.plano_id
+  WHERE a.empresa_id = p_empresa_id
+  AND a.status IN ('trial','ativa')
+  ORDER BY a.criado_em DESC
+  LIMIT 1;
+
+  -- Se não tem assinatura, aplica limites do Trial (padrão)
+  IF v_plano_slug IS NULL THEN
+    v_plano_slug := 'trial';
+    v_max_obras  := 2;
+  END IF;
+
+  -- Conta obras ativas da empresa
+  SELECT COUNT(*) INTO v_obras_ativas
+  FROM obras
+  WHERE empresa_id = p_empresa_id
+  AND status NOT IN ('concluida','cancelada');
+
+  -- Verifica bloqueio
+  SELECT bloqueada INTO v_bloqueada FROM empresas WHERE id = p_empresa_id;
+
+  RETURN jsonb_build_object(
+    'pode_criar',    (NOT COALESCE(v_bloqueada, FALSE)) AND (v_obras_ativas < v_max_obras),
+    'plano',         v_plano_slug,
+    'max_obras',     v_max_obras,
+    'obras_ativas',  v_obras_ativas,
+    'obras_restantes', GREATEST(0, v_max_obras - v_obras_ativas),
+    'bloqueada',     COALESCE(v_bloqueada, FALSE),
+    'motivo',        CASE
+                       WHEN COALESCE(v_bloqueada, FALSE) THEN 'Empresa bloqueada por inadimplência'
+                       WHEN v_obras_ativas >= v_max_obras THEN
+                         CASE WHEN v_plano_slug = 'trial'
+                              THEN 'Limite do plano Trial atingido (2 obras). Faça upgrade para continuar.'
+                              ELSE 'Limite de obras do plano ' || v_plano_slug || ' atingido. Faça upgrade.'
+                         END
+                       ELSE NULL
+                     END
+  );
+END;
+$$;
+
+-- Trigger: bloqueia INSERT em obras se exceder limite do plano
+CREATE OR REPLACE FUNCTION fn_trigger_limite_obras()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+DECLARE
+  v_check JSONB;
+BEGIN
+  v_check := fn_verificar_limite_obras(NEW.empresa_id);
+
+  IF NOT (v_check->>'pode_criar')::BOOLEAN THEN
+    RAISE EXCEPTION 'LIMITE_OBRAS: %', v_check->>'motivo'
+      USING HINT = 'Faça upgrade do seu plano em Configurações > Assinatura';
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_limite_obras ON obras;
+CREATE TRIGGER trg_limite_obras
+  BEFORE INSERT ON obras
+  FOR EACH ROW EXECUTE FUNCTION fn_trigger_limite_obras();
+
+-- View: limites por empresa (útil para frontend mostrar progresso)
+CREATE OR REPLACE VIEW vw_empresa_limites AS
+SELECT
+  e.id            AS empresa_id,
+  e.nome          AS empresa_nome,
+  COALESCE(p.slug, 'trial')      AS plano_slug,
+  COALESCE(p.nome, 'Trial')      AS plano_nome,
+  COALESCE(p.max_obras, 2)       AS max_obras,
+  COALESCE(p.max_usuarios, 1)    AS max_usuarios,
+  COALESCE(p.max_orcamentos, 5)  AS max_orcamentos,
+  COALESCE(p.max_insumos, 50)    AS max_insumos,
+  -- Uso atual
+  (SELECT COUNT(*) FROM obras o
+   WHERE o.empresa_id = e.id AND o.status NOT IN ('concluida','cancelada'))
+   AS obras_ativas,
+  (SELECT COUNT(*) FROM perfis pf WHERE pf.empresa_id = e.id AND pf.ativo = TRUE)
+   AS usuarios_ativos,
+  -- % de uso das obras
+  ROUND(
+    (SELECT COUNT(*) FROM obras o
+     WHERE o.empresa_id = e.id AND o.status NOT IN ('concluida','cancelada'))::NUMERIC
+    / NULLIF(COALESCE(p.max_obras, 2), 0) * 100, 1
+  ) AS obras_uso_pct,
+  -- Flags
+  e.bloqueada,
+  a.status AS assinatura_status,
+  a.trial_fim
+FROM empresas e
+LEFT JOIN assinaturas a ON a.empresa_id = e.id
+  AND a.status IN ('trial','ativa')
+  AND a.criado_em = (
+    SELECT MAX(a2.criado_em) FROM assinaturas a2
+    WHERE a2.empresa_id = e.id AND a2.status IN ('trial','ativa')
+  )
+LEFT JOIN planos p ON p.id = a.plano_id;
 
 -- ─────────────────────────────────────────────────────────────
 -- FIM DO MÓDULO DE BILLING

@@ -166,7 +166,7 @@ td{padding:12px 14px;color:var(--text);vertical-align:middle}
 select.form-input option{background:var(--bg2)}
 
 /* ── PLAN CARD ── */
-.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.plan-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
 .plan-card{
   background:var(--card);border:1px solid var(--border);border-radius:14px;
   padding:24px;position:relative;transition:all .2s;
@@ -544,6 +544,7 @@ select.form-input option{background:var(--bg2)}
           <label class="form-label">Plano *</label>
           <select class="form-input">
             <option value="">Selecione o plano...</option>
+            <option value="trial">Trial — Grátis (14 dias · 2 obras)</option>
             <option value="starter">Starter — R$ 797/ano</option>
             <option value="pro">Pro — R$ 1.597/ano ⭐</option>
             <option value="enterprise">Enterprise — R$ 3.197/ano</option>
@@ -663,6 +664,7 @@ select.form-input option{background:var(--bg2)}
           <label class="form-label">Plano *</label>
           <select class="form-input" onchange="calcPreco(this)">
             <option value="">Selecionar...</option>
+            <option data-avista="0" data-12x="0" data-6x="0" value="trial">Trial — Grátis 🆓</option>
             <option data-avista="797" data-12x="87" data-6x="91" value="starter">Starter</option>
             <option data-avista="1597" data-12x="167" data-6x="177" value="pro">Pro ⭐</option>
             <option data-avista="3197" data-12x="337" data-6x="357" value="enterprise">Enterprise</option>
@@ -708,9 +710,10 @@ select.form-input option{background:var(--bg2)}
 <script>
 // ── DADOS MOCK ────────────────────────────────────────────
 const PLANOS = [
-  {slug:'starter', nome:'Starter', avista:797, p12:87, p6:91, desc_avista:'23,5% off', trial:14, obras:5, usuarios:3},
-  {slug:'pro',     nome:'Pro',     avista:1597,p12:167,p6:177,desc_avista:'20,4% off', trial:14, obras:30, usuarios:10, destaque:true},
-  {slug:'enterprise',nome:'Enterprise',avista:3197,p12:337,p6:357,desc_avista:'20,9% off',trial:30,obras:999,usuarios:50},
+  {slug:'trial',     nome:'Trial',     avista:0,   p12:0,   p6:0,   desc_avista:'Grátis',    trial:14, obras:2,   usuarios:1,  gratis:true},
+  {slug:'starter',   nome:'Starter',   avista:797, p12:87,  p6:91,  desc_avista:'23,5% off', trial:14, obras:5,   usuarios:3},
+  {slug:'pro',       nome:'Pro',       avista:1597,p12:167, p6:177, desc_avista:'20,4% off', trial:14, obras:30,  usuarios:10, destaque:true},
+  {slug:'enterprise',nome:'Enterprise',avista:3197,p12:337, p6:357, desc_avista:'20,9% off', trial:30, obras:999, usuarios:50},
 ]
 
 const EMPRESAS = [
@@ -750,8 +753,8 @@ const EVENTOS = [
 ]
 
 // ── RENDER ────────────────────────────────────────────────
-const planosLabel = {starter:'Starter',pro:'Pro',enterprise:'Enterprise'}
-const planosCor   = {starter:'b-blue',pro:'b-orange',enterprise:'b-purple'}
+const planosLabel = {trial:'Trial',starter:'Starter',pro:'Pro',enterprise:'Enterprise'}
+const planosCor   = {trial:'b-gray',starter:'b-blue',pro:'b-orange',enterprise:'b-purple'}
 
 const statusLabel = {ativa:'Ativa',trial:'Trial',atrasada:'Atrasada',suspensa:'Suspensa',cancelada:'Cancelada',expirada:'Expirada'}
 const statusCor   = {ativa:'b-green',trial:'b-blue',atrasada:'b-red',suspensa:'b-yellow',cancelada:'b-gray',expirada:'b-gray'}
@@ -884,36 +887,52 @@ function renderInadimplentes(){
 
 function renderPlanos(){
   const grid = document.getElementById('plan-grid')
-  grid.innerHTML = PLANOS.map(p=>`
-    <div class="plan-card${p.destaque?' destaque':''}">
-      ${p.destaque?'<div class="destaque-tag">⭐ Mais Popular</div>':''}
+  grid.innerHTML = PLANOS.map(p=>{
+    const badgesHtml = p.gratis
+      ? `<span class="badge b-gray">${EMPRESAS.filter(e=>e.plano===p.slug).length} no trial</span>`
+      : `<span class="badge b-green">${EMPRESAS.filter(e=>e.plano===p.slug&&e.status==='ativa').length} ativas</span>
+         <span class="badge b-blue">${EMPRESAS.filter(e=>e.plano===p.slug&&e.status==='trial').length} trial</span>
+         <span class="badge b-red">${EMPRESAS.filter(e=>e.plano===p.slug&&e.status==='atrasada').length} atraso</span>`
+    const precoHtml = p.gratis
+      ? `<div class="plan-price" style="color:var(--green);font-size:24px">Grátis<span> · 14 dias</span></div>
+         <div class="text-xs text-muted" style="margin-bottom:4px">Sem cartão · Até 2 obras</div>`
+      : `<div class="plan-price">R$${p.p12}<span>/mês (12x)</span></div>
+         <div class="text-xs text-muted">ou R$${p.avista.toLocaleString('pt-BR')}/ano à vista (${p.desc_avista})</div>`
+    const tagHtml = p.destaque
+      ? '<div class="destaque-tag">⭐ Mais Popular</div>'
+      : p.gratis ? '<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#475569;color:#fff;font-size:10px;font-weight:800;padding:3px 12px;border-radius:99px;white-space:nowrap">🆓 SEM CUSTO</div>' : ''
+    const borderStyle = p.gratis ? 'border-color:rgba(100,116,139,0.35)' : ''
+    return `
+    <div class="plan-card${p.destaque?' destaque':''}" style="${borderStyle}">
+      ${tagHtml}
       <div class="plan-name">${p.nome}</div>
-      <div class="plan-price">R$${p.p12}<span>/mês (12x)</span></div>
-      <div class="text-xs text-muted">ou R$${p.avista.toLocaleString('pt-BR')}/ano à vista (${p.desc_avista})</div>
+      ${precoHtml}
       <ul class="plan-features">
-        <li>Até ${p.obras===999?'∞':p.obras} obras simultâneas</li>
-        <li>Até ${p.usuarios===50?'50':p.usuarios} usuários</li>
-        <li>Trial grátis de ${p.trial} dias</li>
-        <li>Banco de insumos completo</li>
-        ${p.slug!=='starter'?'<li>Import SINAPI/FDE</li>':''}
+        <li><strong style="color:${p.gratis?'var(--yellow)':'var(--text)'}">${p.obras===999?'∞':p.obras}</strong> obra${p.obras>1?'s':''} simultânea${p.obras>1?'s':''}</li>
+        <li>${p.usuarios} usuário${p.usuarios>1?'s':''}</li>
+        <li>${p.gratis?'<span style="color:var(--yellow)">Insumos limitados (50)</span>':'Banco de insumos completo'}</li>
+        ${!p.gratis?`<li>Trial de ${p.trial} dias incluído</li>`:''}
+        ${p.slug==='pro'||p.slug==='enterprise'?'<li>Import SINAPI / FDE</li>':''}
         ${p.slug==='enterprise'?'<li>Suporte 24/7 + SLA</li>':''}
+        ${p.gratis?'<li style="color:var(--text3)">Sem suporte dedicado</li>':''}
       </ul>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
-        <span class="badge b-green">${EMPRESAS.filter(e=>e.plano===p.slug&&e.status==='ativa').length} ativas</span>
-        <span class="badge b-blue">${EMPRESAS.filter(e=>e.plano===p.slug&&e.status==='trial').length} trial</span>
-        <span class="badge b-red">${EMPRESAS.filter(e=>e.plano===p.slug&&e.status==='atrasada').length} atraso</span>
-      </div>
-    </div>`).join('')
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">${badgesHtml}</div>
+    </div>`
+  }).join('')
 
   document.getElementById('tbody-planos-comp').innerHTML = PLANOS.map(p=>`
     <tr>
-      <td><strong>${p.nome}</strong></td>
-      <td style="color:var(--green)">R$ ${p.avista.toLocaleString('pt-BR')}</td>
-      <td>R$ ${p.p12}/mês</td>
-      <td>R$ ${p.p6}/mês</td>
-      <td><span class="badge b-green">${p.desc_avista}</span></td>
+      <td>
+        <strong>${p.nome}</strong>
+        ${p.gratis?'<span class="badge b-gray" style="margin-left:6px">Grátis</span>':''}
+        ${p.destaque?'<span class="badge b-orange" style="margin-left:6px">⭐</span>':''}
+      </td>
+      <td style="color:var(--green)">${p.gratis?'<strong>R$ 0,00</strong>':'R$ '+p.avista.toLocaleString('pt-BR')}</td>
+      <td>${p.gratis?'<span class="text-muted">—</span>':'R$ '+p.p12+'/mês'}</td>
+      <td>${p.gratis?'<span class="text-muted">—</span>':'R$ '+p.p6+'/mês'}</td>
+      <td><span class="badge ${p.gratis?'b-green':'b-green'}">${p.desc_avista}</span></td>
       <td>${p.trial} dias</td>
-      <td>${p.obras===999?'Ilimitadas':p.obras}</td>
+      <td>${p.obras===999?'Ilimitadas':p.obras===2?'<strong style="color:var(--yellow)">2</strong>':p.obras}</td>
       <td>${p.usuarios===50?'50':p.usuarios}</td>
     </tr>`).join('')
 }
@@ -1052,7 +1071,8 @@ function calcPreco(el){
   const p6     = parseFloat(opt.dataset['6x']||0)
   const tipo   = tipoEl.value
   let val='', desc=''
-  if(tipo==='avista'){ val=`R$ ${avista.toLocaleString('pt-BR')}`; desc='Pagamento único — desconto à vista aplicado' }
+  if(opt.value==='trial'){ val='Grátis 🆓'; desc='14 dias de acesso · Limite de 2 obras · Sem cartão de crédito' }
+  else if(tipo==='avista'){ val=`R$ ${avista.toLocaleString('pt-BR')}`; desc='Pagamento único — desconto à vista aplicado' }
   else if(tipo==='parcelado_12x'){ val=`12× R$ ${p12.toLocaleString('pt-BR')}/mês`; desc=`Total: R$ ${(p12*12).toLocaleString('pt-BR')}` }
   else { val=`6× R$ ${p6.toLocaleString('pt-BR')}/mês`; desc=`Total: R$ ${(p6*6).toLocaleString('pt-BR')}` }
   document.getElementById('preco-valor').textContent = val
