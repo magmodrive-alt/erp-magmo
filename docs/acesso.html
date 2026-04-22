@@ -3,435 +3,433 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Gestão PRO — Acesso ao Sistema</title>
+<title>Gestão PRO — Software de Gestão de Obras</title>
 <style>
 :root {
-  --bg:#0f1729; --bg2:#1a2540; --bg3:#232f4b; --bg4:#2d3c5c;
-  --orange:#f97316; --orange2:#ea6c0a; --orange3:rgba(249,115,22,0.12);
-  --green:#22c55e; --red:#ef4444; --yellow:#f59e0b;
-  --blue:#3b82f6; --purple:#8b5cf6; --cyan:#06b6d4;
-  --text:#f1f5f9; --text2:#94a3b8; --text3:#64748b;
-  --border:rgba(255,255,255,0.08); --card:rgba(255,255,255,0.04);
+  --orange:#f97316; --orange-dk:#ea6c0a; --orange-lt:#fff7ed; --orange-bd:#fed7aa;
+  --blue:#1d4ed8; --blue-lt:#eff6ff; --blue-mid:#3b82f6;
+  --green:#16a34a; --green-lt:#f0fdf4; --green-bd:#bbf7d0;
+  --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb; --gray-300:#d1d5db;
+  --gray-400:#9ca3af; --gray-500:#6b7280; --gray-600:#4b5563;
+  --gray-700:#374151; --gray-800:#1f2937; --gray-900:#111827;
+  --red:#dc2626; --red-lt:#fef2f2;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04);
+  --shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+  --shadow-lg:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05);
+  --shadow-xl:0 20px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04);
+  --radius:12px; --radius-sm:8px; --radius-lg:16px; --radius-xl:20px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
-
-/* ── GLOW BG ── */
-body::before{
-  content:'';position:fixed;top:-200px;left:-200px;
-  width:600px;height:600px;
-  background:radial-gradient(circle, rgba(249,115,22,0.12) 0%, transparent 70%);
-  pointer-events:none;z-index:0;
-}
-body::after{
-  content:'';position:fixed;bottom:-200px;right:-200px;
-  width:500px;height:500px;
-  background:radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
-  pointer-events:none;z-index:0;
-}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#fff;color:var(--gray-800);min-height:100vh}
 
 /* ── TOPBAR ── */
 .topbar{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  backdrop-filter:blur(12px);background:rgba(15,23,41,0.85);
-  border-bottom:1px solid var(--border);
-  padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;
+  position:fixed;top:0;left:0;right:0;z-index:100;background:#fff;
+  border-bottom:1px solid var(--gray-200);padding:0 40px;height:64px;
+  display:flex;align-items:center;justify-content:space-between;
 }
-.logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none}
 .logo-icon{
-  width:38px;height:38px;background:var(--orange);border-radius:10px;
+  width:40px;height:40px;background:var(--orange);border-radius:10px;
   display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
-  box-shadow:0 4px 14px rgba(249,115,22,0.4);
+  box-shadow:0 4px 12px rgba(249,115,22,0.3);
 }
-.logo-name{font-weight:800;font-size:17px;letter-spacing:-.3px}
-.logo-tag{font-size:10px;color:var(--orange);font-weight:700;letter-spacing:.5px;line-height:1}
+.logo-name{font-weight:800;font-size:18px;color:var(--gray-900);letter-spacing:-.4px}
+.logo-sub{font-size:10px;color:var(--orange);font-weight:700;letter-spacing:.5px;text-transform:uppercase;line-height:1}
 .topbar-nav{display:flex;align-items:center;gap:8px}
 .btn{
-  display:inline-flex;align-items:center;gap:6px;padding:9px 20px;
-  border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;
-  border:none;transition:all .18s;text-decoration:none;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:6px;padding:10px 22px;
+  border-radius:var(--radius-sm);font-weight:700;font-size:14px;cursor:pointer;
+  border:none;transition:all .16s;text-decoration:none;white-space:nowrap;
 }
-.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost{background:transparent;color:var(--gray-600);border:1.5px solid var(--gray-200)}
 .btn-ghost:hover{border-color:var(--orange);color:var(--orange)}
-.btn-orange{background:var(--orange);color:#fff;box-shadow:0 4px 14px rgba(249,115,22,0.3)}
-.btn-orange:hover{background:var(--orange2);box-shadow:0 6px 20px rgba(249,115,22,0.45)}
-.btn-green{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
-.btn-green:hover{background:rgba(34,197,94,.25)}
-.btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border)}
-.btn-outline:hover{border-color:var(--orange);color:var(--orange);background:var(--orange3)}
-.btn-lg{padding:14px 28px;font-size:15px;border-radius:10px}
+.btn-orange{background:var(--orange);color:#fff;box-shadow:0 4px 12px rgba(249,115,22,0.3)}
+.btn-orange:hover{background:var(--orange-dk);box-shadow:0 6px 16px rgba(249,115,22,0.4);transform:translateY(-1px)}
+.btn-outline-orange{background:#fff;color:var(--orange);border:2px solid var(--orange)}
+.btn-outline-orange:hover{background:var(--orange-lt)}
+.btn-lg{padding:14px 32px;font-size:15px;border-radius:10px}
 .btn-full{width:100%;justify-content:center}
-.btn-sm{padding:7px 14px;font-size:12px}
+.btn-sm{padding:8px 16px;font-size:13px}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 4px 12px rgba(22,163,74,0.3)}
+.btn-green:hover{background:#15803d;transform:translateY(-1px)}
 
-/* ── MAIN LAYOUT ── */
-.main{flex:1;display:flex;align-items:center;justify-content:center;padding:100px 20px 60px;position:relative;z-index:1}
-.access-wrap{
-  display:grid;grid-template-columns:1fr 1fr;gap:0;
-  max-width:980px;width:100%;
-  background:var(--bg2);border:1px solid var(--border);border-radius:20px;
-  overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.4);
+/* ── LAYOUT ── */
+.page{min-height:100vh;background:var(--gray-50);display:flex;flex-direction:column}
+.main{flex:1;display:flex;align-items:center;justify-content:center;padding:88px 20px 60px;min-height:100vh}
+
+/* ── SPLIT CARD ── */
+.split{
+  display:grid;grid-template-columns:1.1fr 0.9fr;max-width:1040px;width:100%;
+  background:#fff;border-radius:var(--radius-xl);box-shadow:var(--shadow-xl);
+  border:1px solid var(--gray-200);overflow:hidden;
 }
 
-/* ── LADO ESQUERDO — HERO ── */
+/* ── HERO SIDE ── */
 .hero{
-  background:linear-gradient(145deg, #1a2c50 0%, #0f1f3d 100%);
-  padding:48px 40px;display:flex;flex-direction:column;justify-content:space-between;
+  background:linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%);
+  padding:52px 48px;display:flex;flex-direction:column;justify-content:space-between;
   position:relative;overflow:hidden;
 }
 .hero::before{
-  content:'';position:absolute;top:-80px;right:-80px;
-  width:240px;height:240px;border-radius:50%;
-  background:radial-gradient(circle,rgba(249,115,22,0.15) 0%,transparent 70%);
+  content:'';position:absolute;top:-100px;right:-100px;width:300px;height:300px;
+  border-radius:50%;background:rgba(255,255,255,0.06);
 }
 .hero::after{
-  content:'';position:absolute;bottom:-60px;left:-60px;
-  width:200px;height:200px;border-radius:50%;
-  background:radial-gradient(circle,rgba(59,130,246,0.1) 0%,transparent 70%);
+  content:'';position:absolute;bottom:-80px;left:-80px;width:240px;height:240px;
+  border-radius:50%;background:rgba(255,255,255,0.04);
 }
-.hero-logo{display:flex;align-items:center;gap:12px;margin-bottom:40px}
-.hero-logo-icon{
-  width:52px;height:52px;background:var(--orange);border-radius:14px;
-  display:flex;align-items:center;justify-content:center;font-size:26px;
-  box-shadow:0 8px 24px rgba(249,115,22,0.4);flex-shrink:0;
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);
+  color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:99px;
+  margin-bottom:24px;width:fit-content;border:1px solid rgba(255,255,255,0.2);
+  letter-spacing:.3px;
 }
-.hero-logo-text .name{font-size:22px;font-weight:800}
-.hero-logo-text .tag{font-size:11px;color:var(--orange);font-weight:700;letter-spacing:.8px;text-transform:uppercase}
-.hero-tagline{font-size:28px;font-weight:800;line-height:1.2;margin-bottom:12px;position:relative;z-index:1}
-.hero-tagline span{color:var(--orange)}
-.hero-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:36px;position:relative;z-index:1}
-.hero-features{position:relative;z-index:1}
-.feat-item{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13px;color:var(--text2)}
-.feat-item .fi{
-  width:26px;height:26px;border-radius:7px;background:rgba(249,115,22,0.15);
-  display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;
+.hero-title{font-size:30px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:14px;position:relative;z-index:1}
+.hero-title span{color:#fbbf24}
+.hero-desc{font-size:14px;color:rgba(255,255,255,0.8);line-height:1.7;margin-bottom:36px;position:relative;z-index:1}
+.features{position:relative;z-index:1}
+.feat{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.feat-icon{
+  width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,0.12);
+  display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;
 }
-.feat-item strong{color:var(--text)}
-.hero-footer{position:relative;z-index:1;margin-top:auto;padding-top:32px}
-.hero-plans{display:flex;gap:8px;flex-wrap:wrap}
-.plan-pill{
-  padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;
-  border:1px solid rgba(255,255,255,0.1);color:var(--text2);
+.feat-text{font-size:13px;color:rgba(255,255,255,0.85);line-height:1.4;padding-top:8px}
+.feat-text strong{color:#fff;display:block;font-size:13px;margin-bottom:1px}
+/* Métricas */
+.metrics{
+  position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:12px;margin-top:auto;padding-top:32px;
 }
-.plan-pill.free{border-color:rgba(34,197,94,0.4);color:var(--green);background:rgba(34,197,94,0.08)}
-.plan-pill.hot{border-color:rgba(249,115,22,0.4);color:var(--orange);background:rgba(249,115,22,0.08)}
+.metric{background:rgba(255,255,255,0.1);border-radius:10px;padding:14px 12px;text-align:center;border:1px solid rgba(255,255,255,0.12)}
+.metric .mv{font-size:22px;font-weight:800;color:#fbbf24}
+.metric .ml{font-size:10px;color:rgba(255,255,255,0.7);margin-top:2px;line-height:1.3}
 
-/* ── LADO DIREITO — FORMULÁRIOS ── */
-.form-side{padding:48px 44px;display:flex;flex-direction:column;justify-content:center;position:relative}
+/* ── FORM SIDE ── */
+.form-side{padding:48px 44px;display:flex;flex-direction:column;justify-content:center}
+.form-header{margin-bottom:28px}
+.form-header h1{font-size:24px;font-weight:800;color:var(--gray-900);margin-bottom:6px}
+.form-header p{font-size:14px;color:var(--gray-500)}
 
-/* Tabs de seleção */
-.auth-tabs{display:flex;background:var(--bg3);border-radius:12px;padding:4px;margin-bottom:32px;gap:4px}
-.auth-tab{
-  flex:1;padding:10px;text-align:center;border-radius:9px;font-size:13px;
-  font-weight:700;cursor:pointer;color:var(--text2);transition:all .18s;
+/* Tabs */
+.tabs{display:flex;background:var(--gray-100);border-radius:10px;padding:4px;margin-bottom:28px}
+.tab{
+  flex:1;padding:10px 12px;text-align:center;border-radius:7px;font-size:13px;
+  font-weight:700;cursor:pointer;color:var(--gray-500);transition:all .16s;
 }
-.auth-tab.active{background:var(--bg2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.3)}
-.auth-tab:hover:not(.active){color:var(--text)}
+.tab.active{background:#fff;color:var(--gray-900);box-shadow:var(--shadow-sm)}
+.tab:hover:not(.active){color:var(--gray-700)}
 
-/* Painéis */
-.form-panel{display:none}.form-panel.active{display:block}
+/* Panels */
+.panel{display:none}.panel.active{display:block}
 
-/* Campos */
-.form-group{margin-bottom:18px}
-.form-label{
-  display:block;font-size:12px;font-weight:700;color:var(--text2);
-  margin-bottom:7px;letter-spacing:.3px;text-transform:uppercase;
-}
-.input-wrap{position:relative}
-.input-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none}
-.form-input{
-  width:100%;background:var(--bg3);border:1.5px solid var(--border);
-  color:var(--text);border-radius:10px;padding:12px 14px;font-size:14px;
-  transition:all .15s;
-}
-.form-input.has-icon{padding-left:40px}
-.form-input:focus{outline:none;border-color:var(--orange);background:rgba(249,115,22,0.04);box-shadow:0 0 0 3px rgba(249,115,22,0.1)}
-.form-input::placeholder{color:var(--text3)}
-select.form-input option{background:var(--bg2)}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-
-/* Senha com toggle */
-.pwd-toggle{
-  position:absolute;right:12px;top:50%;transform:translateY(-50%);
-  background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:2px;
-}
-.pwd-toggle:hover{color:var(--text2)}
-
-/* Divider */
-.divider-or{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--text3);font-size:12px}
-.divider-or::before,.divider-or::after{content:'';flex:1;height:1px;background:var(--border)}
-
-/* Step indicator */
-.steps{display:flex;gap:0;margin-bottom:28px;background:var(--bg3);border-radius:10px;padding:4px}
+/* Steps */
+.steps-bar{display:flex;gap:0;background:var(--gray-100);border-radius:10px;padding:4px;margin-bottom:24px}
 .step{
-  flex:1;padding:8px 4px;text-align:center;border-radius:7px;
-  font-size:11px;font-weight:700;cursor:default;color:var(--text3);transition:all .2s;
+  flex:1;padding:8px 6px;text-align:center;border-radius:7px;font-size:11px;
+  font-weight:700;cursor:default;color:var(--gray-400);transition:all .18s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
 }
 .step.done{color:var(--green)}
-.step.active{background:var(--bg2);color:var(--orange);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.step.active{background:#fff;color:var(--orange);box-shadow:var(--shadow-sm)}
 .step .sn{
-  width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;
-  display:inline-flex;align-items:center;justify-content:center;font-size:10px;
-  margin-right:4px;
+  width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;
+  justify-content:center;font-size:10px;border:1.5px solid currentColor;flex-shrink:0;
+  background:transparent;
 }
 .step.done .sn{background:var(--green);border-color:var(--green);color:#fff}
 .step.active .sn{background:var(--orange);border-color:var(--orange);color:#fff}
 
-/* Plan chooser */
-.plan-chooser{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
-.plan-opt{
-  border:1.5px solid var(--border);border-radius:10px;padding:14px 12px;
-  cursor:pointer;transition:all .15s;position:relative;
+/* Inputs */
+.fg{margin-bottom:16px}
+.label{display:block;font-size:12px;font-weight:700;color:var(--gray-600);margin-bottom:6px;letter-spacing:.2px}
+.input-wrap{position:relative}
+.inp{
+  width:100%;background:#fff;border:1.5px solid var(--gray-300);
+  color:var(--gray-900);border-radius:var(--radius-sm);
+  padding:11px 14px;font-size:14px;transition:all .15s;
 }
-.plan-opt:hover{border-color:rgba(249,115,22,0.4)}
-.plan-opt.selected{border-color:var(--orange);background:rgba(249,115,22,0.06)}
-.plan-opt .po-name{font-size:13px;font-weight:800;margin-bottom:2px}
-.plan-opt .po-price{font-size:11px;color:var(--text2)}
-.plan-opt .po-check{
-  position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;
-  background:var(--orange);display:none;align-items:center;justify-content:center;font-size:10px;
+.inp:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,0.1)}
+.inp::placeholder{color:var(--gray-400)}
+.inp.has-icon{padding-left:40px}
+.inp-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none}
+.inp-right{position:absolute;right:12px;top:50%;transform:translateY(-50%)}
+select.inp option{background:#fff;color:var(--gray-900)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* Plano cards */
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.plan-card{
+  border:1.5px solid var(--gray-200);border-radius:10px;padding:14px;
+  cursor:pointer;transition:all .16s;position:relative;background:#fff;
 }
-.plan-opt.selected .po-check{display:flex}
-.plan-opt .po-badge{
-  display:inline-block;font-size:9px;font-weight:800;padding:2px 6px;
-  border-radius:99px;margin-top:4px;
+.plan-card:hover{border-color:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,0.06)}
+.plan-card.sel{border-color:var(--orange);background:var(--orange-lt);box-shadow:0 0 0 3px rgba(249,115,22,0.1)}
+.plan-card .pc-check{
+  position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;
+  background:var(--orange);color:#fff;font-size:10px;font-weight:800;
+  display:none;align-items:center;justify-content:center;
+}
+.plan-card.sel .pc-check{display:flex}
+.plan-card.pop::before{
+  content:'⭐ Popular';position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+  background:var(--orange);color:#fff;font-size:10px;font-weight:800;
+  padding:3px 10px;border-radius:99px;white-space:nowrap;
+}
+.pc-name{font-weight:800;font-size:13px;color:var(--gray-900);margin-bottom:3px}
+.pc-price{font-size:12px;color:var(--gray-500)}
+.pc-tag{
+  display:inline-block;margin-top:6px;font-size:10px;font-weight:700;
+  padding:2px 8px;border-radius:99px;
 }
 
-/* Alert / info */
-.info-box{
-  background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);
-  border-radius:10px;padding:12px 14px;font-size:12px;color:#93c5fd;
-  display:flex;gap:10px;align-items:flex-start;margin-bottom:18px;
+/* Forma pagto */
+.pgto-opts{display:flex;gap:6px}
+.pgto-opt{
+  flex:1;padding:9px 8px;border:1.5px solid var(--gray-200);border-radius:8px;
+  cursor:pointer;text-align:center;font-size:12px;font-weight:600;color:var(--gray-500);transition:all .15s;
 }
-.info-box .ii{flex-shrink:0;font-size:14px;margin-top:1px}
-.success-box{
-  background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);
-  border-radius:10px;padding:14px;font-size:13px;color:#86efac;text-align:center;
-  margin-bottom:18px;display:none;
-}
-.err-box{
-  background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);
-  border-radius:8px;padding:10px 14px;font-size:12px;color:#fca5a5;
-  margin-bottom:12px;display:none;
-}
+.pgto-opt.sel{border-color:var(--orange);color:var(--orange);background:var(--orange-lt)}
+.pgto-opt:hover:not(.sel){border-color:var(--gray-400);color:var(--gray-700)}
 
-/* Senha strength */
-.pwd-strength{margin-top:6px;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
-.pwd-strength-bar{height:100%;border-radius:2px;transition:all .3s;width:0}
+/* Alerts */
+.err{
+  background:var(--red-lt);border:1px solid #fecaca;border-radius:8px;
+  padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:14px;display:none;
+}
+.info{
+  background:var(--blue-lt);border:1px solid #bfdbfe;border-radius:8px;
+  padding:10px 14px;font-size:12px;color:#1e40af;margin-bottom:14px;
+  display:flex;gap:8px;align-items:flex-start;
+}
+.success-panel{
+  background:var(--green-lt);border:1px solid var(--green-bd);border-radius:12px;
+  padding:24px;text-align:center;margin-bottom:16px;display:none;
+}
+.success-panel .s-icon{font-size:40px;margin-bottom:8px}
+.success-panel .s-title{font-size:16px;font-weight:800;color:var(--green);margin-bottom:4px}
+.success-panel .s-sub{font-size:13px;color:var(--gray-500)}
+
+/* Password strength */
+.pwd-bar{height:3px;background:var(--gray-200);border-radius:2px;margin-top:5px;overflow:hidden}
+.pwd-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;width:0}
+
+/* Confirm summary */
+.summary{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:16px;margin-bottom:16px}
+.summary-title{font-size:13px;font-weight:800;color:var(--gray-700);margin-bottom:12px}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+.sum-item .si-label{font-size:10px;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.sum-item .si-val{font-size:13px;font-weight:700;color:var(--gray-800);margin-top:1px}
+.sum-plan{margin-top:12px;padding-top:12px;border-top:1px solid var(--gray-200);display:flex;justify-content:space-between;align-items:center}
 
 /* Helpers */
-.flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}
-.gap-1{gap:4px}.gap-2{gap:8px}.mt-1{margin-top:4px}.mt-2{margin-top:8px}.mt-4{margin-top:16px}
-.text-xs{font-size:11px}.text-sm{font-size:13px}.text-muted{color:var(--text2)}
-.font-bold{font-weight:700}.w-full{width:100%}
 a{color:var(--orange);text-decoration:none;font-weight:600}
 a:hover{text-decoration:underline}
-.text-center{text-align:center}
+.text-center{text-align:center}.text-sm{font-size:13px}.text-xs{font-size:11px}
+.text-muted{color:var(--gray-500)}.font-bold{font-weight:700}
+.divider{height:1px;background:var(--gray-200);margin:20px 0}
+.flex{display:flex}.gap-2{gap:8px}.gap-3{gap:12px}.items-center{align-items:center}
+.justify-between{justify-content:space-between}
+.mt-1{margin-top:4px}.mt-4{margin-top:16px}
 
 /* ── FOOTER ── */
-footer{text-align:center;padding:24px;font-size:11px;color:var(--text3);position:relative;z-index:1}
+footer{text-align:center;padding:20px;font-size:11px;color:var(--gray-400)}
+footer a{color:var(--gray-400);font-weight:400}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.panel.active,.pstep.active{animation:fadeUp .22s ease}
+.pstep{display:none}.pstep.active{display:block}
 
 /* ── MOBILE ── */
-@media(max-width:700px){
-  .access-wrap{grid-template-columns:1fr}
+@media(max-width:720px){
+  .split{grid-template-columns:1fr}
   .hero{display:none}
   .form-side{padding:32px 24px}
   .topbar{padding:0 16px}
 }
-
-/* ── ANIMAÇÕES ── */
-@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.form-panel.active{animation:fadeIn .25s ease}
-.panel-step{display:none}.panel-step.active{display:block;animation:fadeIn .2s ease}
 </style>
 </head>
 <body>
+<div class="page">
 
-<!-- ══ TOPBAR ═══════════════════════════════════════════ -->
+<!-- ══ TOPBAR ══════════════════════════════════════════ -->
 <header class="topbar">
-  <div class="logo" onclick="window.location.reload()">
+  <a href="#" class="logo" onclick="showPanel('login')">
     <div class="logo-icon">🏗</div>
     <div>
       <div class="logo-name">Gestão PRO</div>
-      <div class="logo-tag">ERP para Construção Civil</div>
+      <div class="logo-sub">ERP Construção Civil</div>
     </div>
-  </div>
+  </a>
   <nav class="topbar-nav">
-    <a href="#" class="btn btn-ghost btn-sm" onclick="switchTab('login')">Já tenho conta</a>
-    <a href="#" class="btn btn-orange btn-sm" onclick="switchTab('register')">Criar conta grátis</a>
+    <a href="#" class="btn btn-ghost btn-sm" onclick="showPanel('login');return false">Entrar</a>
+    <a href="#" class="btn btn-orange btn-sm" onclick="showPanel('register');return false">Testar grátis</a>
   </nav>
 </header>
 
-<!-- ══ MAIN ═════════════════════════════════════════════ -->
-<main class="main">
-  <div class="access-wrap">
+<!-- ══ MAIN ════════════════════════════════════════════ -->
+<main class="main" id="main-wrapper">
+  <div class="split" id="split-card">
 
     <!-- ── HERO ── -->
     <div class="hero">
       <div>
-        <div class="hero-logo">
-          <div class="hero-logo-icon">🏗</div>
-          <div class="hero-logo-text">
-            <div class="name">Gestão PRO</div>
-            <div class="tag">ERP Construção Civil</div>
+        <div class="hero-badge">🏗 Software para Construção Civil</div>
+        <h1 class="hero-title">
+          Gerencie suas obras<br>com <span>total controle</span>
+        </h1>
+        <p class="hero-desc">
+          Do orçamento ao recebimento final, tudo em um só lugar. Pare de usar planilha e tenha dados reais em tempo real.
+        </p>
+        <div class="features">
+          <div class="feat">
+            <div class="feat-icon">🏗</div>
+            <div class="feat-text"><strong>Gestão de Obras</strong>Diário, equipe, % de execução e documentos</div>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">📋</div>
+            <div class="feat-text"><strong>Orçamentos Precisos</strong>Com base SINAPI, FDE, ORSE e insumos próprios</div>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">💰</div>
+            <div class="feat-text"><strong>Financeiro Completo</strong>Fluxo de caixa, provisões e conta gerencial</div>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">📊</div>
+            <div class="feat-text"><strong>Relatórios em Tempo Real</strong>DRE por obra, margens e análise de desvios</div>
           </div>
         </div>
-
-        <div class="hero-tagline">
-          O ERP que sua<br><span>construtora precisa</span>
-        </div>
-        <div class="hero-sub">
-          Gerencie obras, orçamentos, equipes e finanças em um só lugar. Controle total do início ao fim da obra.
-        </div>
-
-        <div class="hero-features">
-          <div class="feat-item"><div class="fi">🏗</div><div><strong>Gestão de Obras</strong> — Diário, equipe, % execução</div></div>
-          <div class="feat-item"><div class="fi">📋</div><div><strong>Orçamentos</strong> — Com SINAPI, FDE, ORSE e mais</div></div>
-          <div class="feat-item"><div class="fi">💰</div><div><strong>Financeiro</strong> — Conta gerencial + provisões automáticas</div></div>
-          <div class="feat-item"><div class="fi">📊</div><div><strong>Relatórios</strong> — DRE por obra, fluxo de caixa</div></div>
-          <div class="feat-item"><div class="fi">🔒</div><div><strong>Multi-empresa</strong> — Cada empresa isolada com RLS</div></div>
-        </div>
       </div>
-
-      <div class="hero-footer">
-        <div class="text-xs text-muted" style="margin-bottom:8px">Planos disponíveis:</div>
-        <div class="hero-plans">
-          <span class="plan-pill free">🆓 Trial grátis · 2 obras</span>
-          <span class="plan-pill">Starter · R$797/ano</span>
-          <span class="plan-pill hot">⭐ Pro · R$1.597/ano</span>
-          <span class="plan-pill">Enterprise · R$3.197/ano</span>
-        </div>
+      <div class="metrics">
+        <div class="metric"><div class="mv">+2h</div><div class="ml">economizadas por dia</div></div>
+        <div class="metric"><div class="mv">100%</div><div class="ml">na nuvem</div></div>
+        <div class="metric"><div class="mv">🆓</div><div class="ml">14 dias grátis</div></div>
       </div>
     </div>
 
     <!-- ── FORM SIDE ── -->
     <div class="form-side">
 
-      <!-- TABS -->
-      <div class="auth-tabs">
-        <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">🔐 Entrar</div>
-        <div class="auth-tab" id="tab-register" onclick="switchTab('register')">🏢 Criar Conta</div>
-      </div>
+      <!-- ══ LOGIN ══ -->
+      <div class="panel active" id="panel-login">
+        <div class="form-header">
+          <h1>Bem-vindo de volta 👋</h1>
+          <p>Entre com seus dados para acessar o sistema</p>
+        </div>
 
-      <!-- ════ PAINEL: LOGIN ════ -->
-      <div class="form-panel active" id="panel-login">
-        <div id="login-err" class="err-box">❌ E-mail ou senha incorretos. Tente novamente.</div>
+        <div id="login-err" class="err">E-mail ou senha incorretos. Verifique e tente novamente.</div>
 
-        <div class="form-group">
-          <label class="form-label">E-mail</label>
+        <div class="fg">
+          <label class="label">E-mail</label>
           <div class="input-wrap">
-            <span class="input-icon">✉️</span>
-            <input class="form-input has-icon" type="email" id="login-email" placeholder="seu@email.com" autocomplete="email"/>
+            <span class="inp-icon">📧</span>
+            <input class="inp has-icon" type="email" id="l-email" placeholder="seu@email.com" autocomplete="email"/>
           </div>
         </div>
 
-        <div class="form-group">
-          <div class="flex justify-between items-center" style="margin-bottom:7px">
-            <label class="form-label" style="margin-bottom:0">Senha</label>
-            <a href="#" onclick="showForgot()" style="font-size:11px">Esqueci minha senha</a>
+        <div class="fg">
+          <div class="flex justify-between items-center" style="margin-bottom:6px">
+            <label class="label" style="margin:0">Senha</label>
+            <button type="button" onclick="toggleForgot()" style="background:none;border:none;color:var(--orange);font-size:12px;font-weight:700;cursor:pointer">Esqueci minha senha</button>
           </div>
           <div class="input-wrap">
-            <span class="input-icon">🔑</span>
-            <input class="form-input has-icon" type="password" id="login-pwd" placeholder="••••••••" style="padding-right:40px"/>
-            <button class="pwd-toggle" onclick="togglePwd('login-pwd',this)" type="button">👁</button>
+            <span class="inp-icon">🔑</span>
+            <input class="inp has-icon" type="password" id="l-pwd" placeholder="••••••••" style="padding-right:40px"/>
+            <button type="button" class="inp-right" onclick="tgl('l-pwd',this)" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:15px">👁</button>
           </div>
         </div>
 
-        <div class="flex items-center gap-2" style="margin-bottom:22px">
-          <input type="checkbox" id="remember" style="accent-color:var(--orange);width:14px;height:14px"/>
-          <label for="remember" class="text-xs text-muted" style="cursor:pointer">Manter conectado por 30 dias</label>
+        <div class="flex items-center gap-2" style="margin-bottom:20px">
+          <input type="checkbox" id="lembrar" style="accent-color:var(--orange);width:15px;height:15px;cursor:pointer"/>
+          <label for="lembrar" style="font-size:12px;color:var(--gray-500);cursor:pointer">Manter conectado por 30 dias</label>
         </div>
 
-        <button class="btn btn-orange btn-full btn-lg" onclick="fazerLogin()" id="btn-login">
-          🚀 Acessar o Sistema
-        </button>
+        <button class="btn btn-orange btn-full btn-lg" onclick="fazerLogin()" id="btn-login">Entrar no Sistema →</button>
 
-        <div class="divider-or">ou</div>
+        <!-- Recuperar senha -->
+        <div id="forgot-box" style="display:none;margin-top:18px;padding:16px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px">
+          <div class="font-bold text-sm" style="margin-bottom:10px;color:var(--gray-700)">🔑 Recuperar senha</div>
+          <input class="inp" type="email" placeholder="seu@email.com" id="forgot-email" style="margin-bottom:10px"/>
+          <button class="btn btn-outline-orange btn-full btn-sm" onclick="enviarRecup()">Enviar link →</button>
+          <div id="forgot-ok" style="display:none;margin-top:8px;font-size:12px;color:var(--green);font-weight:700">✅ Link enviado! Verifique seu e-mail.</div>
+        </div>
 
+        <div class="divider"></div>
         <div class="text-center text-sm text-muted">
-          Não tem conta? <a href="#" onclick="switchTab('register')">Criar conta grátis →</a>
-        </div>
-
-        <!-- Recuperar senha (oculto) -->
-        <div id="forgot-panel" style="display:none;margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
-          <div class="text-sm font-bold" style="margin-bottom:12px">🔑 Recuperar senha</div>
-          <div class="form-group">
-            <div class="input-wrap">
-              <span class="input-icon">✉️</span>
-              <input class="form-input has-icon" type="email" placeholder="seu@email.com"/>
-            </div>
-          </div>
-          <button class="btn btn-outline btn-full" onclick="enviarRecuperacao()">Enviar link de recuperação</button>
+          Não tem conta?
+          <a href="#" onclick="showPanel('register');return false"> Criar conta grátis →</a>
         </div>
       </div>
 
-      <!-- ════ PAINEL: CRIAR CONTA ════ -->
-      <div class="form-panel" id="panel-register">
-
-        <!-- Steps -->
-        <div class="steps">
-          <div class="step active" id="step-tab-1"><span class="sn">1</span>Empresa</div>
-          <div class="step" id="step-tab-2"><span class="sn">2</span>Usuário</div>
-          <div class="step" id="step-tab-3"><span class="sn">3</span>Plano</div>
-          <div class="step" id="step-tab-4"><span class="sn">4</span>Confirmar</div>
+      <!-- ══ REGISTER ══ -->
+      <div class="panel" id="panel-register">
+        <div class="form-header">
+          <h1>Criar conta grátis 🚀</h1>
+          <p>14 dias grátis · Sem cartão de crédito · Cancele quando quiser</p>
         </div>
 
-        <!-- ── STEP 1: DADOS DA EMPRESA ── -->
-        <div class="panel-step active" id="step-1">
-          <div class="info-box">
-            <span class="ii">💡</span>
-            <div>Cadastre sua construtora. Cada empresa tem um ambiente totalmente isolado e seguro.</div>
-          </div>
+        <!-- Steps bar -->
+        <div class="steps-bar">
+          <div class="step active" id="st-1"><span class="sn">1</span>Empresa</div>
+          <div class="step" id="st-2"><span class="sn">2</span>Usuário</div>
+          <div class="step" id="st-3"><span class="sn">3</span>Plano</div>
+          <div class="step" id="st-4"><span class="sn">4</span>Confirmar</div>
+        </div>
 
-          <div class="form-group">
-            <label class="form-label">Razão Social / Nome da Empresa *</label>
+        <div id="reg-err" class="err"></div>
+        <div id="reg-success" class="success-panel">
+          <div class="s-icon">🎉</div>
+          <div class="s-title">Conta criada com sucesso!</div>
+          <div class="s-sub">Enviamos um e-mail de confirmação. Verifique sua caixa de entrada para ativar o acesso.</div>
+        </div>
+
+        <!-- ── STEP 1: EMPRESA ── -->
+        <div class="pstep active" id="ps-1">
+          <div class="info">
+            <span>🏢</span>
+            <div>Informe os dados da sua construtora. Cada empresa tem um ambiente totalmente separado e seguro.</div>
+          </div>
+          <div class="fg">
+            <label class="label">Nome da Empresa *</label>
             <div class="input-wrap">
-              <span class="input-icon">🏢</span>
-              <input class="form-input has-icon" id="r-razao" type="text" placeholder="Ex: Construtora Silva Ltda"/>
+              <span class="inp-icon">🏢</span>
+              <input class="inp has-icon" id="r-emp" type="text" placeholder="Ex: Construtora Silva Ltda"/>
             </div>
           </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">CNPJ</label>
-              <div class="input-wrap">
-                <span class="input-icon">📄</span>
-                <input class="form-input has-icon" id="r-cnpj" type="text" placeholder="00.000.000/0001-00" oninput="maskCNPJ(this)"/>
-              </div>
+          <div class="row2">
+            <div class="fg">
+              <label class="label">CNPJ</label>
+              <input class="inp" id="r-cnpj" type="text" placeholder="00.000.000/0001-00" oninput="mCNPJ(this)"/>
             </div>
-            <div class="form-group">
-              <label class="form-label">Telefone</label>
-              <div class="input-wrap">
-                <span class="input-icon">📞</span>
-                <input class="form-input has-icon" id="r-tel" type="text" placeholder="(11) 90000-0000" oninput="maskTel(this)"/>
-              </div>
+            <div class="fg">
+              <label class="label">Telefone</label>
+              <input class="inp" id="r-tel" type="text" placeholder="(11) 90000-0000" oninput="mTel(this)"/>
             </div>
           </div>
-
-          <div class="form-group">
-            <label class="form-label">E-mail Corporativo *</label>
+          <div class="fg">
+            <label class="label">E-mail da Empresa *</label>
             <div class="input-wrap">
-              <span class="input-icon">✉️</span>
-              <input class="form-input has-icon" id="r-email-emp" type="email" placeholder="contato@suaempresa.com.br"/>
+              <span class="inp-icon">📧</span>
+              <input class="inp has-icon" id="r-emp-email" type="email" placeholder="contato@suaconstrutora.com.br"/>
             </div>
           </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Estado (UF)</label>
-              <select class="form-input" id="r-uf">
-                <option value="">Selecione...</option>
-                <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
-                <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
-                <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
-                <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
-                <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
-                <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
-                <option selected>SP</option><option>SE</option><option>TO</option>
+          <div class="row2">
+            <div class="fg">
+              <label class="label">Estado</label>
+              <select class="inp" id="r-uf">
+                <option>SP</option><option>RJ</option><option>MG</option><option>RS</option>
+                <option>PR</option><option>SC</option><option>BA</option><option>GO</option>
+                <option>PE</option><option>CE</option><option>DF</option><option>ES</option>
+                <option>AM</option><option>PA</option><option>MT</option><option>MS</option>
+                <option>RN</option><option>PB</option><option>AL</option><option>SE</option>
+                <option>MA</option><option>PI</option><option>RO</option><option>AC</option>
+                <option>AP</option><option>RR</option><option>TO</option>
               </select>
             </div>
-            <div class="form-group">
-              <label class="form-label">Porte</label>
-              <select class="form-input" id="r-porte">
+            <div class="fg">
+              <label class="label">Porte da Empresa</label>
+              <select class="inp" id="r-porte">
                 <option value="autonomo">Autônomo / MEI</option>
                 <option value="pequena" selected>Pequena empresa</option>
                 <option value="media">Média empresa</option>
@@ -439,422 +437,356 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--text3);position
               </select>
             </div>
           </div>
-
-          <div id="step1-err" class="err-box">⚠️ Preencha o nome da empresa e o e-mail.</div>
-          <button class="btn btn-orange btn-full btn-lg" onclick="goStep(2)">Próximo: Usuário Mestre →</button>
+          <button class="btn btn-orange btn-full btn-lg" onclick="goStep(2)">Próximo →</button>
         </div>
 
         <!-- ── STEP 2: USUÁRIO MESTRE ── -->
-        <div class="panel-step" id="step-2">
-          <div class="info-box">
-            <span class="ii">👑</span>
-            <div>O <strong>Usuário Mestre</strong> tem acesso total ao sistema e pode criar outros usuários e definir permissões.</div>
+        <div class="pstep" id="ps-2">
+          <div class="info">
+            <span>👑</span>
+            <div>O <strong>Usuário Mestre</strong> tem acesso total e pode criar outros usuários com diferentes permissões.</div>
           </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Nome *</label>
-              <div class="input-wrap">
-                <span class="input-icon">👤</span>
-                <input class="form-input has-icon" id="r-nome" type="text" placeholder="Seu nome"/>
-              </div>
+          <div class="row2">
+            <div class="fg">
+              <label class="label">Nome *</label>
+              <input class="inp" id="r-nome" type="text" placeholder="Seu nome"/>
             </div>
-            <div class="form-group">
-              <label class="form-label">Sobrenome *</label>
-              <input class="form-input" id="r-sobrenome" type="text" placeholder="Sobrenome"/>
+            <div class="fg">
+              <label class="label">Sobrenome</label>
+              <input class="inp" id="r-sobre" type="text" placeholder="Sobrenome"/>
             </div>
           </div>
-
-          <div class="form-group">
-            <label class="form-label">E-mail de Acesso *</label>
+          <div class="fg">
+            <label class="label">E-mail de Acesso *</label>
             <div class="input-wrap">
-              <span class="input-icon">✉️</span>
-              <input class="form-input has-icon" id="r-email" type="email" placeholder="seu@email.com" oninput="checkEmailDisp(this)"/>
+              <span class="inp-icon">📧</span>
+              <input class="inp has-icon" id="r-email" type="email" placeholder="seu@email.com" oninput="checkEmail(this)"/>
+              <span class="inp-right" id="email-ico" style="font-size:14px"></span>
             </div>
-            <div id="email-check" class="mt-1 text-xs" style="color:var(--text3)"></div>
           </div>
-
-          <div class="form-group">
-            <label class="form-label">Senha *</label>
+          <div class="fg">
+            <label class="label">Senha *</label>
             <div class="input-wrap">
-              <span class="input-icon">🔑</span>
-              <input class="form-input has-icon" id="r-pwd" type="password" placeholder="Mín. 8 caracteres" style="padding-right:40px" oninput="checkPwdStrength(this)"/>
-              <button class="pwd-toggle" onclick="togglePwd('r-pwd',this)" type="button">👁</button>
+              <span class="inp-icon">🔑</span>
+              <input class="inp has-icon" type="password" id="r-pwd" placeholder="Mínimo 8 caracteres" style="padding-right:40px" oninput="pwdStr(this)"/>
+              <button type="button" class="inp-right" onclick="tgl('r-pwd',this)" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:15px">👁</button>
             </div>
-            <div class="pwd-strength"><div class="pwd-strength-bar" id="pwd-bar"></div></div>
-            <div id="pwd-label" class="mt-1 text-xs" style="color:var(--text3)">Use letras, números e símbolos</div>
+            <div class="pwd-bar"><div class="pwd-fill" id="pf"></div></div>
+            <div id="pwd-lbl" style="font-size:11px;color:var(--gray-400);margin-top:3px"></div>
           </div>
-
-          <div class="form-group">
-            <label class="form-label">Confirmar Senha *</label>
+          <div class="fg">
+            <label class="label">Confirmar Senha *</label>
             <div class="input-wrap">
-              <span class="input-icon">🔒</span>
-              <input class="form-input has-icon" id="r-pwd2" type="password" placeholder="Repita a senha" style="padding-right:40px"/>
-              <button class="pwd-toggle" onclick="togglePwd('r-pwd2',this)" type="button">👁</button>
+              <span class="inp-icon">🔒</span>
+              <input class="inp has-icon" type="password" id="r-pwd2" placeholder="Repita a senha" style="padding-right:40px"/>
+              <button type="button" class="inp-right" onclick="tgl('r-pwd2',this)" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:15px">👁</button>
             </div>
           </div>
-
-          <div class="form-group">
-            <label class="form-label">Cargo</label>
-            <select class="form-input" id="r-cargo">
+          <div class="fg">
+            <label class="label">Cargo</label>
+            <select class="inp" id="r-cargo">
               <option value="dono">Dono / Sócio</option>
               <option value="diretor">Diretor</option>
               <option value="gerente">Gerente de Obras</option>
               <option value="engenheiro">Engenheiro</option>
-              <option value="administrador">Administrador</option>
+              <option value="admin">Administrador</option>
             </select>
           </div>
-
-          <div id="step2-err" class="err-box">⚠️ Preencha todos os campos obrigatórios.</div>
-          <div style="display:flex;gap:10px">
-            <button class="btn btn-outline" style="padding:13px 20px" onclick="goStep(1)">← Voltar</button>
-            <button class="btn btn-orange btn-full btn-lg" onclick="goStep(3)">Próximo: Escolher Plano →</button>
+          <div class="flex gap-3">
+            <button class="btn btn-ghost btn-sm" onclick="goStep(1)" style="padding:13px 20px">← Voltar</button>
+            <button class="btn btn-orange btn-full btn-lg" onclick="goStep(3)">Próximo →</button>
           </div>
         </div>
 
         <!-- ── STEP 3: PLANO ── -->
-        <div class="panel-step" id="step-3">
-          <div class="plan-chooser" id="plan-chooser">
-            <div class="plan-opt selected" data-slug="trial" onclick="selectPlan(this)">
-              <div class="po-check">✓</div>
-              <div class="po-name">🆓 Trial</div>
-              <div class="po-price">Grátis por 14 dias</div>
-              <span class="po-badge" style="background:rgba(34,197,94,.15);color:var(--green)">2 obras</span>
+        <div class="pstep" id="ps-3">
+          <div class="plan-grid">
+            <div class="plan-card sel" data-slug="trial" onclick="selPlan(this)">
+              <div class="pc-check">✓</div>
+              <div class="pc-name">🆓 Trial</div>
+              <div class="pc-price">Grátis por 14 dias</div>
+              <span class="pc-tag" style="background:var(--green-lt);color:var(--green)">2 obras</span>
             </div>
-            <div class="plan-opt" data-slug="starter" onclick="selectPlan(this)">
-              <div class="po-check">✓</div>
-              <div class="po-name">📦 Starter</div>
-              <div class="po-price">R$ 87/mês (12x)</div>
-              <span class="po-badge" style="background:rgba(59,130,246,.15);color:var(--blue)">5 obras</span>
+            <div class="plan-card" data-slug="starter" onclick="selPlan(this)">
+              <div class="pc-check">✓</div>
+              <div class="pc-name">📦 Starter</div>
+              <div class="pc-price">R$ 87/mês · 12x</div>
+              <span class="pc-tag" style="background:var(--blue-lt);color:var(--blue)">5 obras</span>
             </div>
-            <div class="plan-opt" data-slug="pro" onclick="selectPlan(this)" style="border-color:rgba(249,115,22,0.5);background:rgba(249,115,22,0.04)">
-              <div class="po-check">✓</div>
-              <div class="po-name">⭐ Pro</div>
-              <div class="po-price">R$ 167/mês (12x)</div>
-              <span class="po-badge" style="background:rgba(249,115,22,.15);color:var(--orange)">30 obras</span>
+            <div class="plan-card pop" data-slug="pro" onclick="selPlan(this)" style="margin-top:10px">
+              <div class="pc-check">✓</div>
+              <div class="pc-name">⭐ Pro</div>
+              <div class="pc-price">R$ 167/mês · 12x</div>
+              <span class="pc-tag" style="background:var(--orange-lt);color:var(--orange)">30 obras</span>
             </div>
-            <div class="plan-opt" data-slug="enterprise" onclick="selectPlan(this)">
-              <div class="po-check">✓</div>
-              <div class="po-name">🏆 Enterprise</div>
-              <div class="po-price">R$ 337/mês (12x)</div>
-              <span class="po-badge" style="background:rgba(139,92,246,.15);color:var(--purple)">Ilimitadas</span>
-            </div>
-          </div>
-
-          <!-- Detalhe do plano selecionado -->
-          <div id="plan-detail" style="background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:18px;font-size:12px">
-            <div id="pd-titulo" style="font-weight:800;margin-bottom:6px;color:var(--orange)">🆓 Plano Trial — Grátis por 14 dias</div>
-            <div id="pd-desc" style="color:var(--text2);line-height:1.6">Ideal para conhecer o sistema. Sem cartão de crédito. Ao final, escolha um plano pago para continuar.</div>
-            <div id="pd-features" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px"></div>
-          </div>
-
-          <!-- Forma de pagamento (oculto no trial) -->
-          <div id="forma-pgto" style="display:none;margin-bottom:18px">
-            <label class="form-label">Forma de Pagamento</label>
-            <div style="display:flex;gap:8px">
-              <label style="flex:1;cursor:pointer">
-                <input type="radio" name="pgto" value="12x" checked style="accent-color:var(--orange);margin-right:4px"/>
-                <span class="text-sm">12x (mais econômico)</span>
-              </label>
-              <label style="flex:1;cursor:pointer">
-                <input type="radio" name="pgto" value="6x" style="accent-color:var(--orange);margin-right:4px"/>
-                <span class="text-sm">6x</span>
-              </label>
-              <label style="flex:1;cursor:pointer">
-                <input type="radio" name="pgto" value="avista" style="accent-color:var(--orange);margin-right:4px"/>
-                <span class="text-sm">À vista</span>
-              </label>
+            <div class="plan-card" data-slug="enterprise" onclick="selPlan(this)" style="margin-top:10px">
+              <div class="pc-check">✓</div>
+              <div class="pc-name">🏆 Enterprise</div>
+              <div class="pc-price">R$ 337/mês · 12x</div>
+              <span class="pc-tag" style="background:#f5f3ff;color:#7c3aed">Ilimitadas</span>
             </div>
           </div>
 
-          <div style="display:flex;gap:10px">
-            <button class="btn btn-outline" style="padding:13px 20px" onclick="goStep(2)">← Voltar</button>
-            <button class="btn btn-orange btn-full btn-lg" onclick="goStep(4)">Próximo: Confirmar →</button>
+          <!-- Detalhe plano -->
+          <div id="plan-det" style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:12px">
+            <div id="pd-nome" style="font-weight:800;color:var(--orange);margin-bottom:3px">🆓 Trial — Grátis por 14 dias</div>
+            <div id="pd-desc" style="color:var(--gray-500);line-height:1.6">Conheça o sistema sem compromisso. Sem cartão de crédito. Ao final, escolha o plano ideal.</div>
+          </div>
+
+          <!-- Forma de pagamento (só planos pagos) -->
+          <div id="pgto-box" style="display:none;margin-bottom:16px">
+            <label class="label">Forma de Pagamento</label>
+            <div class="pgto-opts">
+              <div class="pgto-opt sel" onclick="selPgto(this,'12x')">12x</div>
+              <div class="pgto-opt" onclick="selPgto(this,'6x')">6x</div>
+              <div class="pgto-opt" onclick="selPgto(this,'avista')">À vista</div>
+            </div>
+          </div>
+
+          <div class="flex gap-3">
+            <button class="btn btn-ghost btn-sm" onclick="goStep(2)" style="padding:13px 20px">← Voltar</button>
+            <button class="btn btn-orange btn-full btn-lg" onclick="goStep(4)">Próximo →</button>
           </div>
         </div>
 
-        <!-- ── STEP 4: CONFIRMAÇÃO ── -->
-        <div class="panel-step" id="step-4">
-          <div id="confirm-box" style="background:var(--bg3);border-radius:12px;padding:18px;margin-bottom:20px;font-size:13px">
-            <div style="font-weight:800;margin-bottom:12px;font-size:14px">📋 Resumo do Cadastro</div>
-            <div id="confirm-content"></div>
+        <!-- ── STEP 4: CONFIRMAR ── -->
+        <div class="pstep" id="ps-4">
+          <div class="summary">
+            <div class="summary-title">📋 Resumo do Cadastro</div>
+            <div class="sum-grid" id="sum-data"></div>
+            <div class="sum-plan" id="sum-plan"></div>
           </div>
 
-          <div class="flex items-center gap-2" style="margin-bottom:16px">
-            <input type="checkbox" id="aceite-termos" style="accent-color:var(--orange);width:14px;height:14px"/>
-            <label for="aceite-termos" class="text-xs text-muted" style="cursor:pointer;line-height:1.5">
-              Li e aceito os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a> do Gestão PRO
+          <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:12px">
+            <input type="checkbox" id="termos" style="accent-color:var(--orange);width:15px;height:15px;margin-top:2px;cursor:pointer;flex-shrink:0"/>
+            <label for="termos" style="font-size:12px;color:var(--gray-500);cursor:pointer;line-height:1.5">
+              Li e aceito os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a>
             </label>
           </div>
 
-          <div class="flex items-center gap-2" style="margin-bottom:20px">
-            <input type="checkbox" id="aceite-dados" style="accent-color:var(--orange);width:14px;height:14px" checked/>
-            <label for="aceite-dados" class="text-xs text-muted" style="cursor:pointer;line-height:1.5">
-              Autorizo o uso dos meus dados para comunicações sobre o sistema
-            </label>
-          </div>
-
-          <div id="step4-err" class="err-box">⚠️ Você precisa aceitar os Termos de Uso para continuar.</div>
-          <div id="success-final" class="success-box">
-            ✅ <strong>Conta criada com sucesso!</strong><br>
-            Verifique seu e-mail para ativar o acesso. Redirecionando...
-          </div>
-
-          <div style="display:flex;gap:10px">
-            <button class="btn btn-outline" style="padding:13px 20px" onclick="goStep(3)">← Voltar</button>
-            <button class="btn btn-orange btn-full btn-lg" onclick="finalizar()" id="btn-finalizar">
-              🚀 Criar Minha Conta
+          <div class="flex gap-3">
+            <button class="btn btn-ghost btn-sm" onclick="goStep(3)" style="padding:13px 20px">← Voltar</button>
+            <button class="btn btn-green btn-full btn-lg" onclick="finalizar()" id="btn-fin">
+              ✅ Criar Minha Conta
             </button>
           </div>
         </div>
 
-      </div><!-- /panel-register -->
+        <div class="divider"></div>
+        <div class="text-center text-sm text-muted">
+          Já tem conta? <a href="#" onclick="showPanel('login');return false">Fazer login →</a>
+        </div>
+      </div>
 
     </div><!-- /form-side -->
-  </div><!-- /access-wrap -->
+  </div><!-- /split -->
 </main>
 
-<!-- ══ FOOTER ═══════════════════════════════════════════ -->
 <footer>
-  &copy; 2026 Gestão PRO · ERP para Construção Civil &nbsp;·&nbsp;
-  <a href="#">Termos de Uso</a> &nbsp;·&nbsp;
+  &copy; 2026 Gestão PRO &nbsp;·&nbsp;
+  <a href="#">Termos</a> &nbsp;·&nbsp;
   <a href="#">Privacidade</a> &nbsp;·&nbsp;
   <a href="#">Suporte</a>
 </footer>
+</div><!-- /page -->
 
 <script>
-// ── STATE ────────────────────────────────────────────────
-let currentStep = 1
-let selectedPlan = 'trial'
-const planDetails = {
-  trial: {
-    titulo: '🆓 Plano Trial — Grátis por 14 dias',
-    desc: 'Ideal para conhecer o sistema. Sem cartão de crédito. Ao final, escolha um plano pago para continuar.',
-    feats: ['2 obras ativas','1 usuário','5 orçamentos','50 insumos','14 dias grátis'],
-    pagto: false
-  },
-  starter: {
-    titulo: '📦 Starter — R$ 797/ano',
-    desc: 'Para autônomos e pequenas construtoras. 5 obras simultâneas, 3 usuários e orçamentos ilimitados.',
-    feats: ['5 obras','3 usuários','30 orçamentos','Insumos completos','Trial 14 dias'],
-    pagto: true
-  },
-  pro: {
-    titulo: '⭐ Pro — R$ 1.597/ano',
-    desc: 'O plano mais popular. 30 obras, 10 usuários, Import SINAPI/FDE, provisões automáticas e relatórios DRE.',
-    feats: ['30 obras','10 usuários','Import SINAPI/FDE','Provisões automáticas','Relatórios DRE','Suporte prioritário'],
-    pagto: true
-  },
-  enterprise: {
-    titulo: '🏆 Enterprise — R$ 3.197/ano',
-    desc: 'Para construtoras de médio e grande porte. Tudo ilimitado, suporte 24/7, SLA garantido e onboarding dedicado.',
-    feats: ['Obras ilimitadas','50 usuários','API acesso','Customizações','Suporte 24/7 + SLA','Onboarding dedicado'],
-    pagto: true
-  }
+// ── STATE ──────────────────────────────────────────────
+let curStep = 1
+let selPlanSlug = 'trial'
+let selPgtoVal  = '12x'
+
+const PLANOS = {
+  trial:      { nome:'🆓 Trial',      desc:'Conheça o sistema sem compromisso. Sem cartão. Ao final, escolha o plano ideal.', pagto:false },
+  starter:    { nome:'📦 Starter',    desc:'Para autônomos e pequenas construtoras. 5 obras, 3 usuários, orçamentos ilimitados.', pagto:true },
+  pro:        { nome:'⭐ Pro',         desc:'O plano mais popular. 30 obras, 10 usuários, SINAPI/FDE, relatórios DRE e muito mais.', pagto:true },
+  enterprise: { nome:'🏆 Enterprise', desc:'Para construtoras de grande porte. Tudo ilimitado, onboarding dedicado e suporte 24/7.', pagto:true },
 }
 
-// ── TABS ─────────────────────────────────────────────────
-function switchTab(tab){
-  document.querySelectorAll('.form-panel').forEach(p=>p.classList.remove('active'))
-  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'))
-  document.getElementById('panel-'+tab).classList.add('active')
-  document.getElementById('tab-'+tab).classList.add('active')
-  if(tab==='register') goStep(1,false)
+// ── TABS ──────────────────────────────────────────────
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+  document.getElementById('panel-'+id).classList.add('active')
+  if (id==='register') goStep(1, false)
 }
 
-// ── STEPS ─────────────────────────────────────────────────
-function goStep(n, validate=true){
-  // Validação ao avançar
-  if(validate && n > currentStep){
-    if(currentStep===1 && !validateStep1()) return
-    if(currentStep===2 && !validateStep2()) return
+// ── STEPS ─────────────────────────────────────────────
+function goStep(n, validate=true) {
+  if (validate && n > curStep) {
+    const errs = validateStep(curStep)
+    if (errs.length) { showErr(errs); return }
   }
-
-  // Atualiza painéis
-  document.querySelectorAll('.panel-step').forEach(p=>p.classList.remove('active'))
-  document.getElementById('step-'+n).classList.add('active')
-
-  // Atualiza tabs
-  for(let i=1;i<=4;i++){
-    const t = document.getElementById('step-tab-'+i)
+  clearErr()
+  document.querySelectorAll('.pstep').forEach(p => p.classList.remove('active'))
+  document.getElementById('ps-'+n).classList.add('active')
+  for (let i=1;i<=4;i++) {
+    const t = document.getElementById('st-'+i)
     t.classList.remove('active','done')
-    if(i===n) t.classList.add('active')
-    else if(i<n) t.classList.add('done')
+    if (i===n)    t.classList.add('active')
+    else if(i<n)  t.classList.add('done')
   }
-
-  currentStep = n
-  if(n===4) renderConfirmacao()
+  curStep = n
+  if (n===4) buildSummary()
 }
 
-// ── VALIDAÇÕES ───────────────────────────────────────────
-function validateStep1(){
-  const razao = document.getElementById('r-razao').value.trim()
-  const email = document.getElementById('r-email-emp').value.trim()
-  const err = document.getElementById('step1-err')
-  if(!razao || !email || !email.includes('@')){ err.style.display='flex'; return false }
-  err.style.display='none'; return true
-}
-
-function validateStep2(){
-  const nome = document.getElementById('r-nome').value.trim()
-  const email = document.getElementById('r-email').value.trim()
-  const pwd = document.getElementById('r-pwd').value
-  const pwd2 = document.getElementById('r-pwd2').value
-  const err = document.getElementById('step2-err')
-  if(!nome||!email||!email.includes('@')||pwd.length<8){
-    err.textContent='⚠️ Preencha todos os campos. A senha deve ter no mínimo 8 caracteres.'
-    err.style.display='flex'; return false
+function validateStep(n) {
+  const errs = []
+  if (n===1) {
+    const emp = v('r-emp'), email = v('r-emp-email')
+    if (!emp)                  errs.push('Informe o nome da empresa.')
+    if (!email||!email.includes('@')) errs.push('Informe um e-mail corporativo válido.')
   }
-  if(pwd!==pwd2){
-    err.textContent='⚠️ As senhas não coincidem.'
-    err.style.display='flex'; return false
+  if (n===2) {
+    const nome  = v('r-nome')
+    const email = v('r-email')
+    const pwd   = v('r-pwd')
+    const pwd2  = v('r-pwd2')
+    if (!nome)                   errs.push('Informe seu nome.')
+    if (!email||!email.includes('@')) errs.push('Informe um e-mail de acesso válido.')
+    if (pwd.length < 8)          errs.push('A senha deve ter no mínimo 8 caracteres.')
+    if (pwd !== pwd2)            errs.push('As senhas não coincidem.')
   }
-  err.style.display='none'; return true
+  return errs
 }
 
-// ── PLAN ─────────────────────────────────────────────────
-function selectPlan(el){
-  document.querySelectorAll('.plan-opt').forEach(p=>p.classList.remove('selected'))
-  el.classList.add('selected')
-  selectedPlan = el.dataset.slug
-  const d = planDetails[selectedPlan]
-  document.getElementById('pd-titulo').textContent = d.titulo
-  document.getElementById('pd-desc').textContent   = d.desc
-  document.getElementById('pd-features').innerHTML = d.feats.map(f=>
-    `<span style="background:rgba(249,115,22,.1);color:var(--orange);padding:3px 8px;border-radius:99px;font-size:10px;font-weight:700">✓ ${f}</span>`
-  ).join('')
-  document.getElementById('forma-pgto').style.display = d.pagto ? 'block' : 'none'
+function showErr(msgs) {
+  const el = document.getElementById('reg-err')
+  el.innerHTML = msgs.map(m=>'⚠️ '+m).join('<br>')
+  el.style.display = 'block'
+}
+function clearErr() { document.getElementById('reg-err').style.display='none' }
+
+// ── PLAN ──────────────────────────────────────────────
+function selPlan(el) {
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('sel'))
+  el.classList.add('sel')
+  selPlanSlug = el.dataset.slug
+  const p = PLANOS[selPlanSlug]
+  document.getElementById('pd-nome').textContent = p.nome
+  document.getElementById('pd-desc').textContent = p.desc
+  document.getElementById('pgto-box').style.display = p.pagto ? 'block' : 'none'
 }
 
-// ── CONFIRMAÇÃO ──────────────────────────────────────────
-function renderConfirmacao(){
-  const razao = document.getElementById('r-razao').value||'—'
-  const email = document.getElementById('r-email').value||'—'
-  const nome  = (document.getElementById('r-nome').value+' '+document.getElementById('r-sobrenome').value).trim()||'—'
+function selPgto(el, val) {
+  document.querySelectorAll('.pgto-opt').forEach(o => o.classList.remove('sel'))
+  el.classList.add('sel')
+  selPgtoVal = val
+}
+
+// ── SUMMARY ───────────────────────────────────────────
+function buildSummary() {
+  const nomeEmp = v('r-emp') || '—'
+  const emailEmp = v('r-emp-email') || '—'
+  const nome  = (v('r-nome')+' '+v('r-sobre')).trim() || '—'
+  const email = v('r-email') || '—'
   const cargo = document.getElementById('r-cargo')
-  const cargoText = cargo.options[cargo.selectedIndex].text
-  const d = planDetails[selectedPlan]
-  const pgtoEl = document.querySelector('input[name="pgto"]:checked')
-  const pgtoText = selectedPlan==='trial' ? 'Grátis (trial 14 dias)'
-    : pgtoEl?.value==='avista' ? 'À vista'
-    : pgtoEl?.value==='6x' ? 'Parcelado em 6x'
-    : 'Parcelado em 12x'
+  const cargoTxt = cargo.options[cargo.selectedIndex]?.text || '—'
+  const plano = PLANOS[selPlanSlug]
+  const pgtoTxt = selPlanSlug==='trial' ? 'Grátis (14 dias)' :
+    selPgtoVal==='avista' ? 'À vista' :
+    selPgtoVal==='6x' ? 'Parcelado 6x' : 'Parcelado 12x'
 
-  document.getElementById('confirm-content').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px">
-      <div><div class="text-xs text-muted">Empresa</div><div class="font-bold">${razao}</div></div>
-      <div><div class="text-xs text-muted">E-mail empresa</div><div>${document.getElementById('r-email-emp').value||'—'}</div></div>
-      <div><div class="text-xs text-muted">Usuário mestre</div><div class="font-bold">${nome}</div></div>
-      <div><div class="text-xs text-muted">Cargo</div><div>${cargoText}</div></div>
-      <div><div class="text-xs text-muted">Login</div><div>${email}</div></div>
-      <div><div class="text-xs text-muted">Permissão</div><div style="color:var(--orange)">👑 Admin Master</div></div>
-    </div>
-    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-      <div class="text-xs text-muted" style="margin-bottom:4px">Plano selecionado</div>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <span class="font-bold" style="color:var(--orange)">${d.titulo}</span>
-        <span class="text-xs" style="color:var(--text2)">${pgtoText}</span>
-      </div>
-    </div>`
+  document.getElementById('sum-data').innerHTML = [
+    ['Empresa', nomeEmp],
+    ['E-mail empresa', emailEmp],
+    ['Usuário mestre', nome],
+    ['E-mail de acesso', email],
+    ['Cargo', cargoTxt],
+    ['Permissão', '👑 Admin Master'],
+  ].map(([l,v])=>`
+    <div class="sum-item">
+      <div class="si-label">${l}</div>
+      <div class="si-val" style="${l==='Permissão'?'color:var(--orange)':''}">${v}</div>
+    </div>`).join('')
+
+  document.getElementById('sum-plan').innerHTML = `
+    <div><div class="si-label">Plano</div><div class="si-val" style="color:var(--orange)">${plano.nome}</div></div>
+    <div class="text-xs text-muted">${pgtoTxt}</div>`
 }
 
-// ── FINALIZAR ────────────────────────────────────────────
-function finalizar(){
-  const aceite = document.getElementById('aceite-termos').checked
-  const err = document.getElementById('step4-err')
-  if(!aceite){ err.style.display='flex'; return }
-  err.style.display='none'
-  const btn = document.getElementById('btn-finalizar')
-  btn.disabled=true; btn.textContent='⏳ Criando conta...'
+// ── FINALIZAR ─────────────────────────────────────────
+function finalizar() {
+  const aceite = document.getElementById('termos').checked
+  if (!aceite) { showErr(['Aceite os Termos de Uso para continuar.']); return }
+  clearErr()
+  const btn = document.getElementById('btn-fin')
+  btn.disabled = true; btn.textContent = '⏳ Criando sua conta...'
   setTimeout(()=>{
-    document.getElementById('success-final').style.display='block'
-    btn.style.display='none'
-    document.querySelector('#step-4 .btn-outline').style.display='none'
-    setTimeout(()=>{ switchTab('login'); btn.disabled=false; btn.style.display=''; btn.textContent='🚀 Criar Minha Conta' },3500)
-  },2000)
+    document.getElementById('reg-success').style.display = 'block'
+    document.getElementById('ps-4').querySelector('.flex.gap-3').style.display = 'none'
+    document.getElementById('ps-4').querySelector('.summary').style.display = 'none'
+    document.getElementById('ps-4').querySelector('[for="termos"]').closest('div').style.display = 'none'
+    setTimeout(()=>{ showPanel('login'); btn.disabled=false; btn.textContent='✅ Criar Minha Conta'; document.getElementById('reg-success').style.display='none' }, 5000)
+  }, 1800)
 }
 
-// ── LOGIN ────────────────────────────────────────────────
-function fazerLogin(){
-  const email = document.getElementById('login-email').value.trim()
-  const pwd   = document.getElementById('login-pwd').value
-  const btn   = document.getElementById('btn-login')
-  const err   = document.getElementById('login-err')
-  if(!email || !pwd){ err.style.display='flex'; return }
-  err.style.display='none'
-  btn.disabled=true; btn.textContent='⏳ Verificando...'
+// ── LOGIN ─────────────────────────────────────────────
+function fazerLogin() {
+  const email = v('l-email'), pwd = v('l-pwd')
+  const err = document.getElementById('login-err')
+  if (!email||!pwd) { err.style.display='block'; return }
+  err.style.display = 'none'
+  const btn = document.getElementById('btn-login')
+  btn.disabled = true; btn.textContent = '⏳ Verificando...'
   setTimeout(()=>{
-    // Demo: aceita qualquer email/senha
-    btn.textContent='✅ Acesso liberado! Redirecionando...'
-    btn.style.background='var(--green)'
-    setTimeout(()=>{ btn.disabled=false; btn.textContent='🚀 Acessar o Sistema'; btn.style.background='' },3000)
-  },1500)
+    btn.textContent = '✅ Acesso liberado!'; btn.style.background='var(--green)'
+    setTimeout(()=>{ btn.disabled=false; btn.textContent='Entrar no Sistema →'; btn.style.background='' }, 2500)
+  }, 1400)
 }
 
-// ── UTILITÁRIOS ──────────────────────────────────────────
-function togglePwd(id, btn){
+// ── RECUPERAR SENHA ───────────────────────────────────
+function toggleForgot() {
+  const b = document.getElementById('forgot-box')
+  b.style.display = b.style.display==='none' ? 'block' : 'none'
+}
+function enviarRecup() {
+  document.getElementById('forgot-ok').style.display = 'block'
+}
+
+// ── HELPERS ───────────────────────────────────────────
+function v(id) { return document.getElementById(id)?.value?.trim()||'' }
+
+function tgl(id, btn) {
   const el = document.getElementById(id)
-  if(el.type==='password'){ el.type='text'; btn.textContent='🙈' }
-  else { el.type='password'; btn.textContent='👁' }
+  el.type = el.type==='password' ? 'text' : 'password'
+  btn.textContent = el.type==='password' ? '👁' : '🙈'
 }
 
-function showForgot(){
-  const p = document.getElementById('forgot-panel')
-  p.style.display = p.style.display==='none'?'block':'none'
+function pwdStr(el) {
+  const p = el.value; let s=0
+  if(p.length>=8)s++; if(/[A-Z]/.test(p))s++; if(/[0-9]/.test(p))s++; if(/[^A-Za-z0-9]/.test(p))s++
+  const fill = document.getElementById('pf')
+  const lbl  = document.getElementById('pwd-lbl')
+  fill.style.width  = (s*25)+'%'
+  fill.style.background = ['','#ef4444','#f59e0b','#3b82f6','#16a34a'][s]
+  lbl.textContent   = ['','Muito fraca','Fraca','Boa','Forte 💪'][s]||''
+  lbl.style.color   = ['','#ef4444','#f59e0b','#3b82f6','#16a34a'][s]||'var(--gray-400)'
 }
 
-function enviarRecuperacao(){
-  alert('✅ Link de recuperação enviado para seu e-mail!')
+let emailTimer
+function checkEmail(el) {
+  clearTimeout(emailTimer)
+  const ico = document.getElementById('email-ico')
+  ico.textContent = ''
+  if (el.value.length < 5 || !el.value.includes('@')) return
+  ico.textContent = '⏳'
+  emailTimer = setTimeout(()=>{ ico.textContent='✅' }, 900)
 }
 
-function checkPwdStrength(el){
-  const v = el.value
-  let score = 0
-  if(v.length>=8) score++
-  if(/[A-Z]/.test(v)) score++
-  if(/[0-9]/.test(v)) score++
-  if(/[^A-Za-z0-9]/.test(v)) score++
-  const bar   = document.getElementById('pwd-bar')
-  const label = document.getElementById('pwd-label')
-  const colors = ['','var(--red)','var(--yellow)','var(--blue)','var(--green)']
-  const labels = ['','Muito fraca','Fraca','Boa','Forte 💪']
-  bar.style.width = (score*25)+'%'
-  bar.style.background = colors[score]||''
-  label.textContent = labels[score]||''
-  label.style.color = colors[score]||'var(--text3)'
-}
-
-function checkEmailDisp(el){
-  const v = el.value.trim()
-  const info = document.getElementById('email-check')
-  if(v.length<5||!v.includes('@')){ info.textContent=''; return }
-  info.textContent = '⏳ Verificando disponibilidade...'
-  info.style.color = 'var(--text3)'
-  setTimeout(()=>{
-    info.textContent = '✅ E-mail disponível'
-    info.style.color = 'var(--green)'
-  },900)
-}
-
-function maskCNPJ(el){
+function mCNPJ(el) {
   let v = el.value.replace(/\D/g,'').substring(0,14)
-  v = v.replace(/^(\d{2})(\d)/,'$1.$2')
-  v = v.replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3')
-  v = v.replace(/\.(\d{3})(\d)/,'.$1/$2')
-  v = v.replace(/(\d{4})(\d)/,'$1-$2')
+  v = v.replace(/^(\d{2})(\d)/,'$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3')
+       .replace(/\.(\d{3})(\d)/,'.$1/$2').replace(/(\d{4})(\d)/,'$1-$2')
   el.value = v
 }
-
-function maskTel(el){
+function mTel(el) {
   let v = el.value.replace(/\D/g,'').substring(0,11)
-  if(v.length<=10) v = v.replace(/^(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3')
-  else v = v.replace(/^(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3')
-  el.value = v
+  el.value = v.length<=10 ? v.replace(/^(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3')
+                           : v.replace(/^(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3')
 }
 
-// ── INIT ─────────────────────────────────────────────────
-// Popula detalhes do plano trial ao carregar
-selectPlan(document.querySelector('.plan-opt[data-slug="trial"]'))
+// ── INIT ──────────────────────────────────────────────
+selPlan(document.querySelector('.plan-card[data-slug="trial"]'))
 </script>
 </body>
 </html>
