@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gestão PRO — Painel SaaS Admin</title>
+<style>
+:root {
+  --bg:#0f1729; --bg2:#1a2540; --bg3:#232f4b;
+  --orange:#f97316; --orange2:#ea6c0a;
+  --green:#22c55e; --red:#ef4444; --yellow:#f59e0b;
+  --blue:#3b82f6; --purple:#8b5cf6; --pink:#ec4899; --cyan:#06b6d4;
+  --text:#f1f5f9; --text2:#94a3b8; --text3:#64748b;
+  --border:rgba(255,255,255,0.07); --card:rgba(255,255,255,0.04);
+  --sidebar:220px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar);min-height:100vh;background:var(--bg2);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;
+  position:fixed;left:0;top:0;bottom:0;z-index:50;
+}
+.sidebar-logo{
+  padding:20px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.logo-icon{
+  width:36px;height:36px;background:var(--orange);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+}
+.logo-text .name{font-weight:800;font-size:14px;color:var(--text)}
+.logo-text .tag{font-size:10px;color:var(--orange);font-weight:700;letter-spacing:.5px}
+.nav{flex:1;padding:12px 8px;overflow-y:auto}
+.nav-section{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.8px;
+  text-transform:uppercase;padding:12px 8px 6px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;
+  font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;
+  transition:all .15s;user-select:none;
+}
+.nav-item:hover{background:rgba(255,255,255,.06);color:var(--text)}
+.nav-item.active{background:rgba(249,115,22,.15);color:var(--orange)}
+.nav-item .icon{font-size:16px;flex-shrink:0}
+.nav-item .badge{
+  margin-left:auto;background:var(--red);color:#fff;
+  font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;
+}
+.nav-item .badge.yellow{background:var(--yellow)}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
+.user-chip{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--card);border-radius:10px;
+}
+.user-av{width:32px;height:32px;border-radius:8px;background:var(--orange);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.user-info .un{font-size:13px;font-weight:600}
+.user-info .ur{font-size:11px;color:var(--orange);font-weight:700}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{
+  height:56px;background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:40;
+}
+.topbar-title{font-weight:700;font-size:16px;flex:1}
+.topbar-sub{font-size:12px;color:var(--text2)}
+.topbar-actions{display:flex;gap:8px;align-items:center}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;border-radius:8px;font-weight:700;font-size:13px;
+  cursor:pointer;border:none;transition:all .15s;text-decoration:none;
+}
+.btn-orange{background:var(--orange);color:#fff}
+.btn-orange:hover{background:var(--orange2)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--orange);color:var(--orange)}
+.btn-green{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.btn-red{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.btn-sm{padding:5px 12px;font-size:12px}
+
+/* ── CONTENT ── */
+.content{padding:24px;flex:1}
+
+/* ── TABS ── */
+.tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px;overflow-x:auto}
+.tab{
+  padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;
+  color:var(--text2);border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;
+}
+.tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* ── STAT CARDS ── */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:18px;position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;right:-10px;top:-10px;
+  width:60px;height:60px;border-radius:50%;opacity:.08;
+}
+.stat-card .sc-icon{font-size:22px;margin-bottom:8px}
+.stat-card .sc-val{font-size:1.8rem;font-weight:800;line-height:1}
+.stat-card .sc-label{font-size:11px;color:var(--text2);margin-top:4px}
+.stat-card .sc-sub{font-size:11px;margin-top:6px}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead{background:var(--bg3)}
+th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;
+   color:var(--text3);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+tbody tr{border-top:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:rgba(255,255,255,.025)}
+td{padding:12px 14px;color:var(--text);vertical-align:middle}
+
+/* ── BADGES ── */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap;
+}
+.b-green {background:rgba(34,197,94,.15); color:var(--green)}
+.b-red   {background:rgba(239,68,68,.15); color:var(--red)}
+.b-yellow{background:rgba(245,158,11,.15);color:var(--yellow)}
+.b-blue  {background:rgba(59,130,246,.15);color:var(--blue)}
+.b-purple{background:rgba(139,92,246,.15);color:var(--purple)}
+.b-gray  {background:rgba(100,116,139,.15);color:var(--text3)}
+.b-orange{background:rgba(249,115,22,.15);color:var(--orange)}
+
+/* ── PROGRESS ── */
+.prog{height:4px;background:var(--border);border-radius:2px;min-width:80px}
+.prog-fill{height:4px;border-radius:2px;transition:width .3s}
+
+/* ── MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:100;align-items:center;justify-content:center;padding:16px;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+  width:100%;max-width:560px;max-height:90vh;overflow-y:auto;
+}
+.modal-head{
+  padding:20px 24px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-head h3{font-size:16px;font-weight:700}
+.modal-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px}
+.modal-body{padding:24px}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+
+/* ── FORM ── */
+.form-group{margin-bottom:16px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px}
+.form-input{
+  width:100%;background:var(--bg3);border:1px solid var(--border);
+  color:var(--text);border-radius:8px;padding:9px 12px;font-size:13px;
+}
+.form-input:focus{outline:none;border-color:var(--orange)}
+select.form-input option{background:var(--bg2)}
+
+/* ── PLAN CARD ── */
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.plan-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:24px;position:relative;transition:all .2s;
+}
+.plan-card.destaque{border-color:var(--orange);box-shadow:0 0 0 1px rgba(249,115,22,.3)}
+.plan-card .destaque-tag{
+  position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+  background:var(--orange);color:#fff;font-size:10px;font-weight:800;
+  padding:3px 12px;border-radius:99px;white-space:nowrap;
+}
+.plan-name{font-size:18px;font-weight:800;margin-bottom:4px}
+.plan-price{font-size:32px;font-weight:800;color:var(--orange);line-height:1;margin:12px 0 4px}
+.plan-price span{font-size:14px;color:var(--text2);font-weight:500}
+.plan-features{list-style:none;margin:16px 0;space-y:4px}
+.plan-features li{font-size:12px;color:var(--text2);padding:4px 0;display:flex;gap:6px;align-items:center}
+.plan-features li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}
+
+/* ── TIMELINE ── */
+.tl{border-left:2px solid var(--border);padding-left:20px;margin-left:8px}
+.tl-item{position:relative;margin-bottom:20px}
+.tl-item::before{
+  content:'';position:absolute;left:-26px;top:5px;
+  width:10px;height:10px;border-radius:50%;border:2px solid var(--border);
+  background:var(--bg2);
+}
+.tl-item.pago::before{background:var(--green);border-color:var(--green)}
+.tl-item.atrasado::before{background:var(--red);border-color:var(--red)}
+.tl-item.vencendo::before{background:var(--yellow);border-color:var(--yellow)}
+.tl-item .tl-header{display:flex;justify-content:space-between;align-items:center}
+.tl-item .tl-title{font-size:13px;font-weight:600}
+.tl-item .tl-meta{font-size:11px;color:var(--text2);margin-top:3px}
+
+/* ── ALERTS ── */
+.alert{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:12px;
+}
+.alert-red{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#fca5a5}
+.alert-yellow{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:#fcd34d}
+.alert-green{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#86efac}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+
+/* ── MISC ── */
+.flex{display:flex}.items-center{align-items:center}.gap-2{gap:8px}.gap-3{gap:12px}
+.font-bold{font-weight:700}.text-sm{font-size:13px}.text-xs{font-size:11px}
+.text-muted{color:var(--text2)}.mt-1{margin-top:4px}.mt-4{margin-top:16px}
+.divider{height:1px;background:var(--border);margin:20px 0}
+.empty{text-align:center;padding:48px;color:var(--text3)}
+.empty .empty-icon{font-size:48px;margin-bottom:12px}
+.empty p{font-size:14px}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏗</div>
+    <div class="logo-text">
+      <div class="name">Gestão PRO</div>
+      <div class="tag">SAAS ADMIN</div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <span class="icon">📊</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('empresas')">
+      <span class="icon">🏢</span> Empresas
+      <span class="badge">12</span>
+    </div>
+
+    <div class="nav-section">Billing</div>
+    <div class="nav-item" onclick="showPage('assinaturas')">
+      <span class="icon">📋</span> Assinaturas
+    </div>
+    <div class="nav-item" onclick="showPage('parcelas')">
+      <span class="icon">💳</span> Cobranças
+      <span class="badge">3</span>
+    </div>
+    <div class="nav-item" onclick="showPage('inadimplentes')">
+      <span class="icon">⚠️</span> Inadimplentes
+      <span class="badge yellow">2</span>
+    </div>
+    <div class="nav-item" onclick="showPage('planos')">
+      <span class="icon">🎯</span> Planos
+    </div>
+
+    <div class="nav-section">Análises</div>
+    <div class="nav-item" onclick="showPage('mrr')">
+      <span class="icon">📈</span> MRR / ARR
+    </div>
+    <div class="nav-item" onclick="showPage('historico')">
+      <span class="icon">🕐</span> Histórico
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-av">M</div>
+      <div class="user-info">
+        <div class="un">MAGMO</div>
+        <div class="ur">SUPERADMIN</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ════════════════════════════════════════════════ -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="page-title">Dashboard</div>
+      <div class="topbar-sub" id="page-sub">Visão geral do SaaS · Gestão PRO</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="openModal('modal-nova-empresa')">+ Empresa</button>
+      <button class="btn btn-orange btn-sm" onclick="openModal('modal-nova-assinatura')">+ Assinatura</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ PAGE: DASHBOARD ═════════════════════════════════ -->
+    <div id="page-dashboard" class="tab-panel active">
+
+      <!-- Alertas -->
+      <div class="alert alert-red">
+        <span class="alert-icon">🚨</span>
+        <div><strong>2 empresas inadimplentes</strong> — Construtora Alfa (42 dias) e Obras Silva (18 dias). Acesso pode ser suspenso.</div>
+      </div>
+      <div class="alert alert-yellow">
+        <span class="alert-icon">⏰</span>
+        <div><strong>3 parcelas vencem nos próximos 7 dias</strong> — R$ 837,00 a receber. <a href="#" onclick="showPage('parcelas')" style="color:var(--yellow)">Ver cobranças →</a></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card" style="border-top:3px solid var(--green)">
+          <div class="sc-icon">🏢</div>
+          <div class="sc-val">12</div>
+          <div class="sc-label">Empresas ativas</div>
+          <div class="sc-sub text-xs" style="color:var(--green)">↑ +2 este mês</div>
+        </div>
+        <div class="stat-card" style="border-top:3px solid var(--orange)">
+          <div class="sc-icon">💰</div>
+          <div class="sc-val">R$4.182</div>
+          <div class="sc-label">MRR atual</div>
+          <div class="sc-sub text-xs" style="color:var(--orange)">↑ +R$ 334 vs mês ant.</div>
+        </div>
+        <div class="stat-card" style="border-top:3px solid var(--blue)">
+          <div class="sc-icon">📅</div>
+          <div class="sc-val">R$50.184</div>
+          <div class="sc-label">ARR (anual)</div>
+          <div class="sc-sub text-xs text-muted">Projeção 12 meses</div>
+        </div>
+        <div class="stat-card" style="border-top:3px solid var(--yellow)">
+          <div class="sc-icon">🔄</div>
+          <div class="sc-val">3</div>
+          <div class="sc-label">Em trial</div>
+          <div class="sc-sub text-xs text-muted">Converteram 68% hist.</div>
+        </div>
+        <div class="stat-card" style="border-top:3px solid var(--red)">
+          <div class="sc-icon">⚠️</div>
+          <div class="sc-val">2</div>
+          <div class="sc-label">Inadimplentes</div>
+          <div class="sc-sub text-xs" style="color:var(--red)">R$ 1.254 em aberto</div>
+        </div>
+        <div class="stat-card" style="border-top:3px solid var(--purple)">
+          <div class="sc-icon">📊</div>
+          <div class="sc-val">94%</div>
+          <div class="sc-label">Taxa de retenção</div>
+          <div class="sc-sub text-xs text-muted">Últimos 12 meses</div>
+        </div>
+      </div>
+
+      <!-- MRR por plano -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px">
+          <div style="font-weight:700;margin-bottom:16px">MRR por Plano</div>
+          <div id="mrr-bars"></div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px">
+          <div style="font-weight:700;margin-bottom:16px">Próximas Cobranças (7 dias)</div>
+          <div id="proximas-cobrancas"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ PAGE: EMPRESAS ══════════════════════════════════ -->
+    <div id="page-empresas" class="tab-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div style="font-size:14px;color:var(--text2)">12 empresas cadastradas</div>
+        <div style="display:flex;gap:8px">
+          <select class="form-input" style="width:auto;font-size:12px;padding:6px 10px" onchange="filterEmpresas(this.value)">
+            <option value="">Todos os status</option>
+            <option value="ativa">Ativas</option>
+            <option value="trial">Em Trial</option>
+            <option value="atrasada">Atrasadas</option>
+            <option value="suspensa">Suspensas</option>
+          </select>
+          <button class="btn btn-orange btn-sm" onclick="openModal('modal-nova-empresa')">+ Nova Empresa</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="tbl-empresas">
+          <thead><tr>
+            <th>Empresa</th><th>Plano</th><th>Status Assinatura</th>
+            <th>Parcelas</th><th>Próx. Vencimento</th><th>Valor Aberto</th><th>Ações</th>
+          </tr></thead>
+          <tbody id="tbody-empresas"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: ASSINATURAS ═══════════════════════════════ -->
+    <div id="page-assinaturas" class="tab-panel">
+      <div class="tab-bar">
+        <div class="tab active" onclick="showSubTab(this,'subtab-todas')">Todas</div>
+        <div class="tab" onclick="showSubTab(this,'subtab-ativas')">Ativas</div>
+        <div class="tab" onclick="showSubTab(this,'subtab-trial')">Trial</div>
+        <div class="tab" onclick="showSubTab(this,'subtab-atraso')">Em Atraso</div>
+      </div>
+      <div id="subtab-todas" class="tab-panel active">
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Empresa</th><th>Plano</th><th>Tipo Pgto</th><th>Total</th>
+              <th>Parcelas</th><th>Recebido</th><th>A Receber</th><th>Status</th><th>Início</th><th>Fim</th><th></th>
+            </tr></thead>
+            <tbody id="tbody-todas"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="subtab-ativas"  class="tab-panel"><div id="lista-ativas"></div></div>
+      <div id="subtab-trial"   class="tab-panel"><div id="lista-trial"></div></div>
+      <div id="subtab-atraso"  class="tab-panel"><div id="lista-atraso"></div></div>
+    </div>
+
+    <!-- ══ PAGE: COBRANÇAS ════════════════════════════════ -->
+    <div id="page-parcelas" class="tab-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div>
+          <div style="font-size:14px;color:var(--text2)" id="parcelas-resumo"></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <select class="form-input" style="width:auto;font-size:12px;padding:6px 10px" onchange="filterParcelas(this.value)">
+            <option value="">Todos</option>
+            <option value="atrasado">Atrasadas</option>
+            <option value="vencendo">Vencendo em 7d</option>
+            <option value="pendente">Pendentes</option>
+            <option value="pago">Pagas</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Empresa</th><th>Plano</th><th>Parcela</th><th>Valor</th>
+            <th>Vencimento</th><th>Atraso</th><th>Status</th><th>Método</th><th>Ações</th>
+          </tr></thead>
+          <tbody id="tbody-parcelas"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: INADIMPLENTES ════════════════════════════ -->
+    <div id="page-inadimplentes" class="tab-panel">
+      <div class="alert alert-red" style="margin-bottom:20px">
+        <span class="alert-icon">🚨</span>
+        <div><strong>Atenção:</strong> Empresas com mais de 15 dias de atraso são bloqueadas automaticamente pelo sistema.</div>
+      </div>
+      <div id="cards-inadimplentes" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px"></div>
+    </div>
+
+    <!-- ══ PAGE: PLANOS ═══════════════════════════════════ -->
+    <div id="page-planos" class="tab-panel">
+      <div class="plan-grid" id="plan-grid"></div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px">
+        <div style="font-weight:700;margin-bottom:4px">Comparativo de Preços</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:16px">Todos os planos têm vigência anual. O desconto à vista é aplicado automaticamente.</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Plano</th><th>Anual à Vista</th><th>Parcelado 12x</th><th>Parcelado 6x</th>
+              <th>Desconto à Vista</th><th>Trial</th><th>Obras</th><th>Usuários</th>
+            </tr></thead>
+            <tbody id="tbody-planos-comp"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: MRR ══════════════════════════════════════ -->
+    <div id="page-mrr" class="tab-panel">
+      <div class="stats-row">
+        <div class="stat-card" style="border-top:3px solid var(--orange)">
+          <div class="sc-icon">📈</div><div class="sc-val">R$4.182</div>
+          <div class="sc-label">MRR Total</div>
+        </div>
+        <div class="stat-card" style="border-top:3px solid var(--blue)">
+          <div class="sc-icon">🎯</div><div class="sc-val">R$50.184</div>
+          <div class="sc-label">ARR</div>
+        </div>
+        <div class="stat-card" style="border-top:3px solid var(--green)">
+          <div class="sc-icon">➕</div><div class="sc-val">R$334</div>
+          <div class="sc-label">New MRR (mês)</div>
+        </div>
+        <div class="stat-card" style="border-top:3px solid var(--red)">
+          <div class="sc-icon">➖</div><div class="sc-val">R$167</div>
+          <div class="sc-label">Churn MRR (mês)</div>
+        </div>
+        <div class="stat-card" style="border-top:3px solid var(--purple)">
+          <div class="sc-icon">💰</div><div class="sc-val">R$249</div>
+          <div class="sc-label">ARPU médio</div>
+        </div>
+        <div class="stat-card" style="border-top:3px solid var(--cyan)">
+          <div class="sc-icon">🔄</div><div class="sc-val">6%</div>
+          <div class="sc-label">Churn Rate</div>
+        </div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px">
+        <div style="font-weight:700;margin-bottom:16px">Receita Mensal — Últimos 12 Meses</div>
+        <div id="mrr-chart" style="padding:20px 0"></div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: HISTÓRICO ════════════════════════════════ -->
+    <div id="page-historico" class="tab-panel">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px">
+        <div style="font-weight:700;margin-bottom:20px">Histórico de Eventos</div>
+        <div id="tl-eventos" class="tl"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ══ MODAL: NOVA EMPRESA ════════════════════════════════ -->
+<div class="modal-overlay" id="modal-nova-empresa">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>🏢 Nova Empresa</h3>
+      <button class="modal-close" onclick="closeModal('modal-nova-empresa')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nome da Empresa *</label>
+          <input class="form-input" type="text" placeholder="Ex: Construtora Silva">
+        </div>
+        <div class="form-group">
+          <label class="form-label">CNPJ</label>
+          <input class="form-input" type="text" placeholder="00.000.000/0001-00">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Email *</label>
+          <input class="form-input" type="email" placeholder="contato@empresa.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefone</label>
+          <input class="form-input" type="text" placeholder="(11) 90000-0000">
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div style="font-weight:700;margin-bottom:12px;font-size:14px">Assinatura</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Plano *</label>
+          <select class="form-input">
+            <option value="">Selecione o plano...</option>
+            <option value="starter">Starter — R$ 797/ano</option>
+            <option value="pro">Pro — R$ 1.597/ano ⭐</option>
+            <option value="enterprise">Enterprise — R$ 3.197/ano</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Forma de Pagamento *</label>
+          <select class="form-input">
+            <option value="parcelado_12x">12x (parcelado)</option>
+            <option value="parcelado_6x">6x (parcelado)</option>
+            <option value="avista">À Vista (desconto)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Dia de Vencimento</label>
+          <select class="form-input">
+            <option value="5">Dia 5</option>
+            <option value="10" selected>Dia 10</option>
+            <option value="15">Dia 15</option>
+            <option value="20">Dia 20</option>
+            <option value="25">Dia 25</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Origem</label>
+          <select class="form-input">
+            <option value="organico">Orgânico</option>
+            <option value="indicacao">Indicação</option>
+            <option value="ads">Ads/Tráfego pago</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observações</label>
+        <textarea class="form-input" rows="2" placeholder="Notas internas..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-nova-empresa')">Cancelar</button>
+      <button class="btn btn-orange" onclick="closeModal('modal-nova-empresa')">✓ Criar Empresa + Assinatura</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CONFIRMAR PAGAMENTO ═══════════════════════ -->
+<div class="modal-overlay" id="modal-pagar">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>✅ Confirmar Pagamento</h3>
+      <button class="modal-close" onclick="closeModal('modal-pagar')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-green" style="margin-bottom:16px">
+        <span class="alert-icon">💡</span>
+        <div id="pagar-info">Confirmar pagamento da parcela</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Valor Pago (R$) *</label>
+          <input class="form-input" type="number" id="pagar-valor" step="0.01" placeholder="0,00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data do Pagamento *</label>
+          <input class="form-input" type="date" id="pagar-data">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Método de Pagamento *</label>
+          <select class="form-input" id="pagar-metodo">
+            <option value="pix">PIX</option>
+            <option value="boleto">Boleto</option>
+            <option value="transferencia">Transferência</option>
+            <option value="cartao_credito">Cartão de Crédito</option>
+            <option value="dinheiro">Dinheiro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Código / Transação</label>
+          <input class="form-input" type="text" id="pagar-codigo" placeholder="ID da transação">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Comprovante URL</label>
+        <input class="form-input" type="url" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observações</label>
+        <textarea class="form-input" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-pagar')">Cancelar</button>
+      <button class="btn btn-green" onclick="confirmarPagamento()">✓ Confirmar Pagamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: NOVA ASSINATURA ════════════════════════════ -->
+<div class="modal-overlay" id="modal-nova-assinatura">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>📋 Nova Assinatura</h3>
+      <button class="modal-close" onclick="closeModal('modal-nova-assinatura')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Empresa *</label>
+        <select class="form-input">
+          <option value="">Selecione a empresa...</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Plano *</label>
+          <select class="form-input" onchange="calcPreco(this)">
+            <option value="">Selecionar...</option>
+            <option data-avista="797" data-12x="87" data-6x="91" value="starter">Starter</option>
+            <option data-avista="1597" data-12x="167" data-6x="177" value="pro">Pro ⭐</option>
+            <option data-avista="3197" data-12x="337" data-6x="357" value="enterprise">Enterprise</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo de Pagamento *</label>
+          <select class="form-input" onchange="calcPreco(this)">
+            <option value="parcelado_12x">12x Parcelado</option>
+            <option value="parcelado_6x">6x Parcelado</option>
+            <option value="avista">À Vista (desconto)</option>
+          </select>
+        </div>
+      </div>
+      <div id="preco-preview" style="background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.3);border-radius:10px;padding:14px;margin-bottom:16px;display:none">
+        <div style="font-size:12px;color:var(--text2)">Valor da assinatura</div>
+        <div id="preco-valor" style="font-size:24px;font-weight:800;color:var(--orange)"></div>
+        <div id="preco-desc" style="font-size:12px;color:var(--text2);margin-top:4px"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Dia de Vencimento</label>
+          <select class="form-input">
+            <option value="5">Dia 5</option>
+            <option value="10" selected>Dia 10</option>
+            <option value="15">Dia 15</option>
+            <option value="20">Dia 20</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Vendedor</label>
+          <input class="form-input" placeholder="Nome do vendedor">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-nova-assinatura')">Cancelar</button>
+      <button class="btn btn-orange" onclick="closeModal('modal-nova-assinatura')">✓ Criar Assinatura</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DADOS MOCK ────────────────────────────────────────────
+const PLANOS = [
+  {slug:'starter', nome:'Starter', avista:797, p12:87, p6:91, desc_avista:'23,5% off', trial:14, obras:5, usuarios:3},
+  {slug:'pro',     nome:'Pro',     avista:1597,p12:167,p6:177,desc_avista:'20,4% off', trial:14, obras:30, usuarios:10, destaque:true},
+  {slug:'enterprise',nome:'Enterprise',avista:3197,p12:337,p6:357,desc_avista:'20,9% off',trial:30,obras:999,usuarios:50},
+]
+
+const EMPRESAS = [
+  {id:1, nome:'Construtora Alfa',  plano:'pro',    status:'atrasada',   parcPagas:5, parcTotal:12, parcAtraso:2, proximo:'2026-04-18', aberto:334,  inicio:'2025-05-01', fim:'2026-04-30', email:'alfa@email.com'},
+  {id:2, nome:'Obras Silva & Filhos', plano:'starter', status:'atrasada',parcPagas:8,parcTotal:12,parcAtraso:1, proximo:'2026-04-22', aberto:87,   inicio:'2025-02-01', fim:'2026-01-31', email:'silva@email.com'},
+  {id:3, nome:'Construtora Beta',  plano:'pro',    status:'ativa',      parcPagas:4, parcTotal:12, parcAtraso:0, proximo:'2026-05-10', aberto:167,  inicio:'2026-01-10', fim:'2027-01-09', email:'beta@email.com'},
+  {id:4, nome:'AJR Engenharia',    plano:'enterprise',status:'ativa',   parcPagas:3, parcTotal:12, parcAtraso:0, proximo:'2026-05-15', aberto:337,  inicio:'2026-02-15', fim:'2027-02-14', email:'ajr@email.com'},
+  {id:5, nome:'BuildMax',          plano:'pro',    status:'ativa',      parcPagas:2, parcTotal:12, parcAtraso:0, proximo:'2026-05-20', aberto:167,  inicio:'2026-03-20', fim:'2027-03-19', email:'bmax@email.com'},
+  {id:6, nome:'TerraFirme Obras',  plano:'starter',status:'trial',      parcPagas:0, parcTotal:12, parcAtraso:0, proximo:'2026-05-04', aberto:0,    inicio:'2026-04-08', fim:'2027-04-07', email:'terra@email.com'},
+  {id:7, nome:'Grupo Construlink', plano:'pro',    status:'trial',      parcPagas:0, parcTotal:12, parcAtraso:0, proximo:'2026-05-01', aberto:0,    inicio:'2026-04-15', fim:'2027-04-14', email:'clink@email.com'},
+  {id:8, nome:'DiamanteBuild',     plano:'enterprise',status:'ativa',   parcPagas:7, parcTotal:12, parcAtraso:0, proximo:'2026-05-05', aberto:337,  inicio:'2025-10-05', fim:'2026-10-04', email:'diam@email.com'},
+  {id:9, nome:'Pavior Construções',plano:'starter',status:'ativa',      parcPagas:10,parcTotal:12, parcAtraso:0, proximo:'2026-06-10', aberto:87,   inicio:'2025-07-10', fim:'2026-07-09', email:'pav@email.com'},
+  {id:10,nome:'VertexObras',       plano:'pro',    status:'ativa',      parcPagas:1, parcTotal:12, parcAtraso:0, proximo:'2026-05-12', aberto:167,  inicio:'2026-04-12', fim:'2027-04-11', email:'vtx@email.com'},
+]
+
+const PARCELAS = [
+  {id:1, emp:'Construtora Alfa',  plano:'Pro',       num:6, total:12, valor:167,  venc:'2026-04-18', status:'atrasado', dias:4,  metodo:null},
+  {id:2, emp:'Construtora Alfa',  plano:'Pro',       num:7, total:12, valor:167,  venc:'2026-05-18', status:'pendente', dias:0,  metodo:null},
+  {id:3, emp:'Obras Silva',       plano:'Starter',   num:9, total:12, valor:87,   venc:'2026-04-22', status:'atrasado', dias:0,  metodo:null},
+  {id:4, emp:'Construtora Beta',  plano:'Pro',       num:5, total:12, valor:167,  venc:'2026-05-10', status:'vencendo', dias:0,  metodo:null},
+  {id:5, emp:'AJR Engenharia',    plano:'Enterprise',num:4, total:12, valor:337,  venc:'2026-05-15', status:'vencendo', dias:0,  metodo:null},
+  {id:6, emp:'DiamanteBuild',     plano:'Enterprise',num:8, total:12, valor:337,  venc:'2026-05-05', status:'vencendo', dias:0,  metodo:null},
+  {id:7, emp:'Construtora Beta',  plano:'Pro',       num:4, total:12, valor:167,  venc:'2026-04-10', status:'pago',     dias:0,  metodo:'pix'},
+  {id:8, emp:'AJR Engenharia',    plano:'Enterprise',num:3, total:12, valor:337,  venc:'2026-04-15', status:'pago',     dias:0,  metodo:'boleto'},
+  {id:9, emp:'Pavior Construções',plano:'Starter',   num:10,total:12, valor:87,   venc:'2026-04-10', status:'pago',     dias:0,  metodo:'transferencia'},
+]
+
+const EVENTOS = [
+  {tipo:'pago',     emp:'AJR Engenharia',    desc:'Parcela 3/12 confirmada — R$ 337,00 via Boleto',       data:'22/04/2026'},
+  {tipo:'atraso',   emp:'Construtora Alfa',  desc:'Parcela 6/12 vencida há 4 dias sem pagamento',          data:'22/04/2026'},
+  {tipo:'trial',    emp:'Grupo Construlink', desc:'Empresa iniciou período de trial — 14 dias',            data:'15/04/2026'},
+  {tipo:'novo',     emp:'VertexObras',       desc:'Nova assinatura criada — Plano Pro 12x R$ 167/mês',     data:'12/04/2026'},
+  {tipo:'pago',     emp:'Pavior Construções',desc:'Parcela 10/12 confirmada — R$ 87,00 via PIX',           data:'10/04/2026'},
+  {tipo:'upgrade',  emp:'DiamanteBuild',     desc:'Upgrade de Pro → Enterprise na renovação',              data:'05/04/2026'},
+  {tipo:'cancelado',emp:'Construções Leve',  desc:'Assinatura cancelada por solicitação da empresa',       data:'01/04/2026'},
+  {tipo:'pago',     emp:'BuildMax',          desc:'Parcela 2/12 confirmada — R$ 167,00 via Transferência', data:'20/03/2026'},
+]
+
+// ── RENDER ────────────────────────────────────────────────
+const planosLabel = {starter:'Starter',pro:'Pro',enterprise:'Enterprise'}
+const planosCor   = {starter:'b-blue',pro:'b-orange',enterprise:'b-purple'}
+
+const statusLabel = {ativa:'Ativa',trial:'Trial',atrasada:'Atrasada',suspensa:'Suspensa',cancelada:'Cancelada',expirada:'Expirada'}
+const statusCor   = {ativa:'b-green',trial:'b-blue',atrasada:'b-red',suspensa:'b-yellow',cancelada:'b-gray',expirada:'b-gray'}
+
+const parcStatusLabel = {pago:'Pago',pendente:'Pendente',atrasado:'Atrasado',vencendo:'Vence em breve',cancelado:'Cancelado'}
+const parcStatusCor   = {pago:'b-green',pendente:'b-gray',atrasado:'b-red',vencendo:'b-yellow',cancelado:'b-gray'}
+
+function fmt(v){return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2})}
+function fmtDate(s){if(!s)return'—';const[a,m,d]=s.split('-');return`${d}/${m}/${a}`}
+
+function renderEmpresasTable(list){
+  const tb = document.getElementById('tbody-empresas')
+  tb.innerHTML = list.map(e=>`
+    <tr>
+      <td>
+        <div class="font-bold">${e.nome}</div>
+        <div class="text-xs text-muted mt-1">${e.email}</div>
+      </td>
+      <td><span class="badge ${planosCor[e.plano]}">${planosLabel[e.plano]}</span></td>
+      <td><span class="badge ${statusCor[e.status]}">${statusLabel[e.status]}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="prog"><div class="prog-fill" style="width:${(e.parcPagas/e.parcTotal)*100}%;background:${e.parcAtraso>0?'var(--red)':'var(--green)'}"></div></div>
+          <span class="text-xs text-muted">${e.parcPagas}/${e.parcTotal}</span>
+        </div>
+        ${e.parcAtraso>0?`<div class="text-xs" style="color:var(--red);margin-top:2px">⚠ ${e.parcAtraso} em atraso</div>`:''}
+      </td>
+      <td class="text-sm">${fmtDate(e.proximo)}</td>
+      <td class="font-bold">${e.aberto>0?`<span style="color:${e.status==='atrasada'?'var(--red)':'var(--text)'}">R$ ${e.aberto}</span>`:'—'}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm" onclick="showPage('parcelas')">Ver parcelas</button>
+          ${e.status==='atrasada'?`<button class="btn btn-red btn-sm">Suspender</button>`:''}
+        </div>
+      </td>
+    </tr>`).join('')
+}
+
+function renderTodasAssinaturas(){
+  const tb = document.getElementById('tbody-todas')
+  tb.innerHTML = EMPRESAS.map(e=>{
+    const valParcela = e.plano==='starter'?87:e.plano==='pro'?167:337
+    const total = valParcela*12
+    const recebido = valParcela*e.parcPagas
+    const aberto = total-recebido
+    return`<tr>
+      <td><div class="font-bold">${e.nome}</div><div class="text-xs text-muted">${e.email}</div></td>
+      <td><span class="badge ${planosCor[e.plano]}">${planosLabel[e.plano]}</span></td>
+      <td><span class="text-xs text-muted">12x</span></td>
+      <td class="font-bold">${fmt(total)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="prog"><div class="prog-fill" style="width:${(e.parcPagas/12)*100}%;background:var(--green)"></div></div>
+          <span class="text-xs text-muted">${e.parcPagas}/12</span>
+        </div>
+      </td>
+      <td style="color:var(--green)">${fmt(recebido)}</td>
+      <td style="color:${e.status==='atrasada'?'var(--red)':'var(--text)'}">${fmt(aberto)}</td>
+      <td><span class="badge ${statusCor[e.status]}">${statusLabel[e.status]}</span></td>
+      <td class="text-xs text-muted">${fmtDate(e.inicio)}</td>
+      <td class="text-xs text-muted">${fmtDate(e.fim)}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="verParcelas(${e.id})">Parcelas</button></td>
+    </tr>`}).join('')
+}
+
+function renderParcelasTable(list){
+  const tb = document.getElementById('tbody-parcelas')
+  document.getElementById('parcelas-resumo').textContent =
+    `${list.length} cobranças — ${list.filter(p=>p.status==='atrasado').length} atrasadas`
+  tb.innerHTML = list.map(p=>`
+    <tr>
+      <td class="font-bold">${p.emp}</td>
+      <td><span class="badge ${p.plano==='Pro'?'b-orange':p.plano==='Starter'?'b-blue':'b-purple'}">${p.plano}</span></td>
+      <td class="text-sm text-muted">${p.num}/${p.total}</td>
+      <td class="font-bold">${fmt(p.valor)}</td>
+      <td class="text-sm">${fmtDate(p.venc)}</td>
+      <td>${p.dias>0?`<span style="color:var(--red);font-weight:700">+${p.dias}d</span>`:'—'}</td>
+      <td><span class="badge ${parcStatusCor[p.status]}">${parcStatusLabel[p.status]}</span></td>
+      <td class="text-xs text-muted">${p.metodo?p.metodo.toUpperCase():'—'}</td>
+      <td>
+        ${p.status!=='pago'&&p.status!=='cancelado'?`
+          <button class="btn btn-green btn-sm" onclick="abrirPagar(${p.id},'${p.emp}',${p.valor},${p.num})">✓ Confirmar</button>
+        `:'<span class="text-xs text-muted">—</span>'}
+      </td>
+    </tr>`).join('')
+}
+
+function renderInadimplentes(){
+  const div = document.getElementById('cards-inadimplentes')
+  const inad = EMPRESAS.filter(e=>e.status==='atrasada')
+  div.innerHTML = inad.map(e=>{
+    const valParcela = e.plano==='starter'?87:e.plano==='pro'?167:337
+    const parcsAtraso = PARCELAS.filter(p=>p.emp.includes(e.nome.split(' ')[0])&&p.status==='atrasado')
+    const totalAtrasado = parcsAtraso.reduce((s,p)=>s+p.valor,0)
+    const maxDias = Math.max(...parcsAtraso.map(p=>p.dias||1))
+    return`
+    <div style="background:var(--card);border:2px solid rgba(239,68,68,.4);border-radius:14px;padding:20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+        <div>
+          <div style="font-weight:800;font-size:16px">${e.nome}</div>
+          <div class="text-xs text-muted">${e.email}</div>
+        </div>
+        <span class="badge b-red">⚠ Inadimplente</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div style="background:rgba(239,68,68,.08);border-radius:8px;padding:12px">
+          <div class="text-xs text-muted">Total em Atraso</div>
+          <div style="font-size:20px;font-weight:800;color:var(--red)">${fmt(totalAtrasado)}</div>
+        </div>
+        <div style="background:rgba(245,158,11,.08);border-radius:8px;padding:12px">
+          <div class="text-xs text-muted">Dias em Atraso</div>
+          <div style="font-size:20px;font-weight:800;color:var(--yellow)">${maxDias} dias</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:12px">
+        Plano: <strong>${planosLabel[e.plano]}</strong> · 
+        Parcelas: ${e.parcPagas}/${e.parcTotal} pagas · 
+        ${e.parcAtraso} em atraso
+      </div>
+      ${maxDias>15?`<div class="alert alert-red" style="margin-bottom:12px;padding:8px 12px;font-size:12px">
+        🚨 Acesso bloqueado automaticamente (>${15} dias)
+      </div>`:''}
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-green btn-sm" onclick="abrirPagar(${e.id},'${e.nome}',${e.aberto},${e.parcAtraso})">✓ Registrar Pagamento</button>
+        <button class="btn btn-ghost btn-sm">📧 Enviar Cobrança</button>
+        <button class="btn btn-red btn-sm">🔒 Suspender</button>
+      </div>
+    </div>`}).join('')
+}
+
+function renderPlanos(){
+  const grid = document.getElementById('plan-grid')
+  grid.innerHTML = PLANOS.map(p=>`
+    <div class="plan-card${p.destaque?' destaque':''}">
+      ${p.destaque?'<div class="destaque-tag">⭐ Mais Popular</div>':''}
+      <div class="plan-name">${p.nome}</div>
+      <div class="plan-price">R$${p.p12}<span>/mês (12x)</span></div>
+      <div class="text-xs text-muted">ou R$${p.avista.toLocaleString('pt-BR')}/ano à vista (${p.desc_avista})</div>
+      <ul class="plan-features">
+        <li>Até ${p.obras===999?'∞':p.obras} obras simultâneas</li>
+        <li>Até ${p.usuarios===50?'50':p.usuarios} usuários</li>
+        <li>Trial grátis de ${p.trial} dias</li>
+        <li>Banco de insumos completo</li>
+        ${p.slug!=='starter'?'<li>Import SINAPI/FDE</li>':''}
+        ${p.slug==='enterprise'?'<li>Suporte 24/7 + SLA</li>':''}
+      </ul>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+        <span class="badge b-green">${EMPRESAS.filter(e=>e.plano===p.slug&&e.status==='ativa').length} ativas</span>
+        <span class="badge b-blue">${EMPRESAS.filter(e=>e.plano===p.slug&&e.status==='trial').length} trial</span>
+        <span class="badge b-red">${EMPRESAS.filter(e=>e.plano===p.slug&&e.status==='atrasada').length} atraso</span>
+      </div>
+    </div>`).join('')
+
+  document.getElementById('tbody-planos-comp').innerHTML = PLANOS.map(p=>`
+    <tr>
+      <td><strong>${p.nome}</strong></td>
+      <td style="color:var(--green)">R$ ${p.avista.toLocaleString('pt-BR')}</td>
+      <td>R$ ${p.p12}/mês</td>
+      <td>R$ ${p.p6}/mês</td>
+      <td><span class="badge b-green">${p.desc_avista}</span></td>
+      <td>${p.trial} dias</td>
+      <td>${p.obras===999?'Ilimitadas':p.obras}</td>
+      <td>${p.usuarios===50?'50':p.usuarios}</td>
+    </tr>`).join('')
+}
+
+function renderMRRChart(){
+  const meses = ['Mai','Jun','Jul','Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr']
+  const vals   = [3180,3347,3514,3681,3681,3848,3848,4015,4015,4015,4182,4182]
+  const max = Math.max(...vals)
+  document.getElementById('mrr-chart').innerHTML = `
+    <div style="display:flex;align-items:flex-end;gap:8px;height:140px">
+      ${meses.map((m,i)=>`
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+          <div style="font-size:9px;color:var(--text2)">${i===11?'<b style="color:var(--orange)">'+vals[i].toLocaleString('pt-BR')+'</b>':vals[i].toLocaleString('pt-BR')}</div>
+          <div style="width:100%;background:${i===11?'var(--orange)':'rgba(249,115,22,0.4)'};border-radius:4px 4px 0 0;
+               height:${Math.round((vals[i]/max)*100)}px;transition:height .3s"></div>
+          <div style="font-size:10px;color:var(--text2)">${m}</div>
+        </div>`).join('')}
+    </div>`
+}
+
+function renderMRRBars(){
+  const mrrPorPlano = [
+    {nome:'Starter',mrr:87*5,cor:'var(--blue)',n:5},
+    {nome:'Pro',mrr:167*5,cor:'var(--orange)',n:5},
+    {nome:'Enterprise',mrr:337*2,cor:'var(--purple)',n:2},
+  ]
+  const total = mrrPorPlano.reduce((s,p)=>s+p.mrr,0)
+  document.getElementById('mrr-bars').innerHTML = mrrPorPlano.map(p=>`
+    <div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span style="font-weight:600">${p.nome}</span>
+        <span><strong>R$ ${p.mrr.toLocaleString('pt-BR')}</strong> <span class="text-muted">(${p.n} clientes)</span></span>
+      </div>
+      <div style="background:var(--border);border-radius:4px;height:8px">
+        <div style="width:${Math.round(p.mrr/total*100)}%;height:8px;border-radius:4px;background:${p.cor};transition:width .3s"></div>
+      </div>
+    </div>`).join('')
+}
+
+function renderProximasCobrancas(){
+  const prox = PARCELAS.filter(p=>p.status==='vencendo'||p.status==='atrasado').slice(0,5)
+  document.getElementById('proximas-cobrancas').innerHTML = prox.length===0
+    ? '<div class="text-xs text-muted">Nenhuma cobrança urgente</div>'
+    : prox.map(p=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div class="text-sm font-bold">${p.emp}</div>
+          <div class="text-xs text-muted">${p.num}/${p.total} · ${fmtDate(p.venc)}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="font-bold" style="font-size:13px">${fmt(p.valor)}</div>
+          <span class="badge ${parcStatusCor[p.status]}" style="font-size:10px">${parcStatusLabel[p.status]}</span>
+        </div>
+      </div>`).join('')
+}
+
+function renderHistorico(){
+  const icons = {pago:'✅',atraso:'⚠️',trial:'🔵',novo:'➕',upgrade:'⬆️',cancelado:'❌'}
+  const cores  = {pago:'pago',atraso:'atrasado',trial:'',novo:'',upgrade:'pago',cancelado:''}
+  document.getElementById('tl-eventos').innerHTML = EVENTOS.map(e=>`
+    <div class="tl-item ${cores[e.tipo]||''}">
+      <div class="tl-header">
+        <span class="text-sm font-bold">${icons[e.tipo]||'•'} ${e.emp}</span>
+        <span class="text-xs text-muted">${e.data}</span>
+      </div>
+      <div class="tl-meta">${e.desc}</div>
+    </div>`).join('')
+}
+
+// ── NAVEGAÇÃO ─────────────────────────────────────────────
+const pages = {
+  'dashboard':{title:'Dashboard',sub:'Visão geral do SaaS · Gestão PRO'},
+  'empresas':{title:'Empresas',sub:'Todas as construtoras cadastradas'},
+  'assinaturas':{title:'Assinaturas',sub:'Controle de planos e contratos anuais'},
+  'parcelas':{title:'Cobranças',sub:'Parcelas pendentes, vencidas e pagas'},
+  'inadimplentes':{title:'Inadimplentes',sub:'Empresas com pagamento em atraso'},
+  'planos':{title:'Planos',sub:'Gestão dos planos Starter · Pro · Enterprise'},
+  'mrr':{title:'MRR / ARR',sub:'Métricas de receita recorrente'},
+  'historico':{title:'Histórico',sub:'Log de eventos e movimentações'},
+}
+
+function showPage(id){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'))
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'))
+  const panel = document.getElementById('page-'+id)
+  if(panel) panel.classList.add('active')
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.textContent.trim().toLowerCase().includes((pages[id]?.title||'').toLowerCase().substring(0,5)))
+      n.classList.add('active')
+  })
+  const pg = pages[id]||{title:id,sub:''}
+  document.getElementById('page-title').textContent = pg.title
+  document.getElementById('page-sub').textContent   = pg.sub
+}
+
+function showSubTab(el, id){
+  const bar = el.closest('.tab-bar')
+  bar.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'))
+  el.classList.add('active')
+  const parent = bar.nextElementSibling?.closest('.tab-panel')?.parentNode || bar.parentNode
+  parent.querySelectorAll(':scope > .tab-panel').forEach(p=>p.classList.remove('active'))
+  const tp = document.getElementById(id)
+  if(tp) tp.classList.add('active')
+}
+
+function filterEmpresas(status){
+  renderEmpresasTable(status?EMPRESAS.filter(e=>e.status===status):EMPRESAS)
+}
+function filterParcelas(status){
+  renderParcelasTable(status?PARCELAS.filter(p=>p.status===status):PARCELAS)
+}
+
+// ── MODAIS ────────────────────────────────────────────────
+function openModal(id){ document.getElementById(id).classList.add('open') }
+function closeModal(id){ document.getElementById(id).classList.remove('open') }
+
+function abrirPagar(id, emp, valor, num){
+  document.getElementById('pagar-info').innerHTML = `<strong>${emp}</strong> — Parcela ${num}`
+  document.getElementById('pagar-valor').value = valor
+  document.getElementById('pagar-data').value = new Date().toISOString().split('T')[0]
+  openModal('modal-pagar')
+}
+function confirmarPagamento(){
+  closeModal('modal-pagar')
+  alert('✅ Pagamento confirmado com sucesso!\nSaldo da empresa atualizado.')
+}
+
+function calcPreco(el){
+  const form = el.closest('.modal-body')
+  const planoEl = form.querySelector('select:first-of-type')
+  const tipoEl  = form.querySelectorAll('select')[1]
+  const opt = planoEl.options[planoEl.selectedIndex]
+  if(!opt.value){ document.getElementById('preco-preview').style.display='none'; return }
+  const avista = parseFloat(opt.dataset.avista||0)
+  const p12    = parseFloat(opt.dataset['12x']||0)
+  const p6     = parseFloat(opt.dataset['6x']||0)
+  const tipo   = tipoEl.value
+  let val='', desc=''
+  if(tipo==='avista'){ val=`R$ ${avista.toLocaleString('pt-BR')}`; desc='Pagamento único — desconto à vista aplicado' }
+  else if(tipo==='parcelado_12x'){ val=`12× R$ ${p12.toLocaleString('pt-BR')}/mês`; desc=`Total: R$ ${(p12*12).toLocaleString('pt-BR')}` }
+  else { val=`6× R$ ${p6.toLocaleString('pt-BR')}/mês`; desc=`Total: R$ ${(p6*6).toLocaleString('pt-BR')}` }
+  document.getElementById('preco-valor').textContent = val
+  document.getElementById('preco-desc').textContent  = desc
+  document.getElementById('preco-preview').style.display = 'block'
+}
+
+// Fechar modal clicando fora
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open') })
+})
+
+// ── INIT ─────────────────────────────────────────────────
+renderEmpresasTable(EMPRESAS)
+renderTodasAssinaturas()
+renderParcelasTable(PARCELAS)
+renderInadimplentes()
+renderPlanos()
+renderMRRChart()
+renderMRRBars()
+renderProximasCobrancas()
+renderHistorico()
+</script>
+</body>
+</html>
