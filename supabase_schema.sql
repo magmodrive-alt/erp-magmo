@@ -682,13 +682,17 @@ LANGUAGE sql STABLE AS $$
   SELECT empresa_id FROM perfis WHERE id = auth.uid()
 $$;
 
--- Políticas: cada usuário vê apenas dados da sua empresa
+-- ─────────────────────────────────────────────────────────────
+-- Políticas para tabelas COM empresa_id direto
+-- ─────────────────────────────────────────────────────────────
 DO $$
 DECLARE
   t TEXT;
-  tables TEXT[] := ARRAY['clientes','fornecedores','obras','obras_documentos',
-    'obras_diario','orcamentos','orcamentos_itens','contas_financeiras',
-    'lancamentos','medicoes','contratos'];
+  tables TEXT[] := ARRAY[
+    'clientes', 'fornecedores', 'obras',
+    'orcamentos', 'contas_financeiras',
+    'lancamentos', 'medicoes', 'contratos'
+  ];
 BEGIN
   FOREACH t IN ARRAY tables LOOP
     EXECUTE format('DROP POLICY IF EXISTS policy_empresa_%s ON %s', t, t);
@@ -701,7 +705,50 @@ BEGIN
   END LOOP;
 END $$;
 
--- Insumos: usuário vê seus próprios + insumos públicos (empresa_id NULL)
+-- ─────────────────────────────────────────────────────────────
+-- Políticas para tabelas FILHAS (sem empresa_id, acesso via join)
+-- ─────────────────────────────────────────────────────────────
+
+-- obras_documentos → obra_id → obras.empresa_id
+DROP POLICY IF EXISTS policy_empresa_obras_documentos ON obras_documentos;
+CREATE POLICY policy_empresa_obras_documentos ON obras_documentos
+  USING (obra_id IN (SELECT id FROM obras WHERE empresa_id = auth_empresa_id()));
+
+-- obras_diario → obra_id → obras.empresa_id
+DROP POLICY IF EXISTS policy_empresa_obras_diario ON obras_diario;
+CREATE POLICY policy_empresa_obras_diario ON obras_diario
+  USING (obra_id IN (SELECT id FROM obras WHERE empresa_id = auth_empresa_id()));
+
+-- obras_equipe → obra_id → obras.empresa_id
+DROP POLICY IF EXISTS policy_empresa_obras_equipe ON obras_equipe;
+CREATE POLICY policy_empresa_obras_equipe ON obras_equipe
+  USING (obra_id IN (SELECT id FROM obras WHERE empresa_id = auth_empresa_id()));
+
+-- orcamentos_grupos → orcamento_id → orcamentos.empresa_id
+DROP POLICY IF EXISTS policy_empresa_orcamentos_grupos ON orcamentos_grupos;
+CREATE POLICY policy_empresa_orcamentos_grupos ON orcamentos_grupos
+  USING (orcamento_id IN (SELECT id FROM orcamentos WHERE empresa_id = auth_empresa_id()));
+
+-- orcamentos_itens → orcamento_id → orcamentos.empresa_id
+DROP POLICY IF EXISTS policy_empresa_orcamentos_itens ON orcamentos_itens;
+CREATE POLICY policy_empresa_orcamentos_itens ON orcamentos_itens
+  USING (orcamento_id IN (SELECT id FROM orcamentos WHERE empresa_id = auth_empresa_id()));
+
+-- composicoes_itens → composicao_id → composicoes.empresa_id (nullable)
+DROP POLICY IF EXISTS policy_empresa_composicoes_itens ON composicoes_itens;
+CREATE POLICY policy_empresa_composicoes_itens ON composicoes_itens
+  USING (composicao_id IN (
+    SELECT id FROM composicoes WHERE empresa_id IS NULL OR empresa_id = auth_empresa_id()
+  ));
+
+-- medicoes_itens → medicao_id → medicoes.empresa_id
+DROP POLICY IF EXISTS policy_empresa_medicoes_itens ON medicoes_itens;
+CREATE POLICY policy_empresa_medicoes_itens ON medicoes_itens
+  USING (medicao_id IN (SELECT id FROM medicoes WHERE empresa_id = auth_empresa_id()));
+
+-- ─────────────────────────────────────────────────────────────
+-- Insumos: vê os próprios + base pública (empresa_id NULL)
+-- ─────────────────────────────────────────────────────────────
 DROP POLICY IF EXISTS policy_insumos ON insumos;
 CREATE POLICY policy_insumos ON insumos
   USING (empresa_id IS NULL OR empresa_id = auth_empresa_id())
@@ -712,7 +759,9 @@ CREATE POLICY policy_composicoes ON composicoes
   USING (empresa_id IS NULL OR empresa_id = auth_empresa_id())
   WITH CHECK (empresa_id = auth_empresa_id());
 
--- Perfis: usuário vê apenas o seu perfil e da sua empresa
+-- ─────────────────────────────────────────────────────────────
+-- Perfis: cada usuário vê apenas perfis da sua empresa
+-- ─────────────────────────────────────────────────────────────
 DROP POLICY IF EXISTS policy_perfis ON perfis;
 CREATE POLICY policy_perfis ON perfis
   USING (empresa_id = auth_empresa_id());
