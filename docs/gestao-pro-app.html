@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Gestão PRO — ERP Construção Civil</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --orange:#f97316;--orange2:#ea6c0a;--orange-lt:#fff7ed;
+  --blue:#1d4ed8;--green:#16a34a;--green-lt:#f0fdf4;
+  --red:#dc2626;--red-lt:#fef2f2;--yellow:#d97706;
+  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
+  --gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;
+  --gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;
+  --sidebar:240px;--shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px -1px rgba(0,0,0,.1);
+  --shadow-lg:0 10px 15px -3px rgba(0,0,0,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh}
+/* ── UTILITÁRIOS ── */
+.hidden{display:none!important}
+.flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}
+.gap-2{gap:8px}.gap-3{gap:12px}.gap-4{gap:16px}
+.font-bold{font-weight:700}.font-semibold{font-weight:600}
+.text-sm{font-size:13px}.text-xs{font-size:11px}.text-lg{font-size:18px}.text-xl{font-size:20px}.text-2xl{font-size:24px}
+.text-muted{color:var(--gray-500)}.text-center{text-align:center}
+.mt-1{margin-top:4px}.mt-2{margin-top:8px}.mt-4{margin-top:16px}.mb-4{margin-bottom:16px}
+.p-4{padding:16px}.p-6{padding:24px}
+.rounded{border-radius:8px}.rounded-lg{border-radius:12px}.rounded-xl{border-radius:16px}
+.w-full{width:100%}
+.border{border:1px solid var(--gray-200)}
+/* ── BOTÕES ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;border:none;transition:all .15s;text-decoration:none}
+.btn-orange{background:var(--orange);color:#fff;box-shadow:0 2px 8px rgba(249,115,22,.3)}
+.btn-orange:hover{background:var(--orange2)}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:#15803d}
+.btn-ghost{background:transparent;color:var(--gray-600);border:1.5px solid var(--gray-300)}
+.btn-ghost:hover{border-color:var(--orange);color:var(--orange)}
+.btn-red{background:var(--red-lt);color:var(--red);border:1px solid #fecaca}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-lg{padding:13px 28px;font-size:15px;border-radius:10px}
+.btn-full{width:100%;justify-content:center}
+/* ── CARDS ── */
+.card{background:#fff;border:1px solid var(--gray-200);border-radius:12px;box-shadow:var(--shadow)}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between}
+.card-body{padding:20px}
+/* ── FORMULÁRIO ── */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;font-weight:700;color:var(--gray-600);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px}
+.form-input{width:100%;background:#fff;border:1.5px solid var(--gray-300);color:var(--gray-900);border-radius:8px;padding:10px 13px;font-size:14px;transition:border-color .15s}
+.form-input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,.1)}
+.form-input::placeholder{color:var(--gray-400)}
+select.form-input option{background:#fff}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px}
+.badge-green{background:#dcfce7;color:#16a34a}
+.badge-orange{background:#ffedd5;color:#ea580c}
+.badge-blue{background:#dbeafe;color:#1d4ed8}
+.badge-red{background:#fee2e2;color:#dc2626}
+.badge-yellow{background:#fef3c7;color:#d97706}
+.badge-gray{background:var(--gray-100);color:var(--gray-600)}
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--gray-200)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead{background:var(--gray-50)}
+th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--gray-200)}
+tbody tr{border-top:1px solid var(--gray-100);transition:background .1s}
+tbody tr:hover{background:var(--gray-50)}
+td{padding:12px 14px;vertical-align:middle}
+/* ── STAT CARD ── */
+.stat-card{background:#fff;border:1px solid var(--gray-200);border-radius:12px;padding:20px;box-shadow:var(--shadow)}
+.stat-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
+.stat-val{font-size:26px;font-weight:800;color:var(--gray-900);line-height:1}
+.stat-label{font-size:12px;color:var(--gray-500);margin-top:4px}
+.stat-change{font-size:11px;margin-top:6px;font-weight:600}
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar);min-height:100vh;background:#fff;border-right:1px solid var(--gray-200);position:fixed;left:0;top:0;bottom:0;z-index:50;display:flex;flex-direction:column}
+.sidebar-logo{padding:18px 16px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:10px}
+.logo-icon{width:38px;height:38px;background:var(--orange);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 3px 8px rgba(249,115,22,.35)}
+.logo-name{font-weight:800;font-size:16px;color:var(--gray-900)}
+.logo-sub{font-size:9px;color:var(--orange);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.nav{flex:1;padding:10px 8px;overflow-y:auto}
+.nav-section{font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.8px;padding:12px 8px 6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--gray-600);cursor:pointer;transition:all .15s;user-select:none}
+.nav-item:hover{background:var(--gray-100);color:var(--gray-900)}
+.nav-item.active{background:#fff7ed;color:var(--orange)}
+.nav-item .ni{font-size:16px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--orange);color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:99px}
+.sidebar-footer{padding:12px;border-top:1px solid var(--gray-200)}
+.user-chip{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--gray-50);border-radius:10px;border:1px solid var(--gray-200)}
+.user-av{width:32px;height:32px;border-radius:8px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0}
+/* ── TOPBAR ── */
+.topbar{position:fixed;top:0;left:var(--sidebar);right:0;z-index:40;height:60px;background:#fff;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;padding:0 24px;gap:16px}
+.topbar-title{font-weight:800;font-size:16px;flex:1}
+.topbar-sub{font-size:12px;color:var(--gray-400)}
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar);padding-top:60px;min-height:100vh}
+.content{padding:24px}
+/* ── PAGES ── */
+.page{display:none}.page.active{display:block}
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between}
+.modal-header h3{font-size:16px;font-weight:800}
+.modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--gray-400);padding:2px}
+.modal-body{padding:24px}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;justify-content:flex-end;gap:8px}
+/* ── ALERT ── */
+.alert{padding:11px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:flex;gap:8px;align-items:flex-start}
+.alert-red{background:var(--red-lt);border:1px solid #fecaca;color:var(--red)}
+.alert-green{background:var(--green-lt);border:1px solid #bbf7d0;color:var(--green)}
+.alert-orange{background:var(--orange-lt);border:1px solid #fed7aa;color:#c2410c}
+/* ── LOGIN ── */
+#login-page{min-height:100vh;background:var(--gray-50);display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:#fff;border:1px solid var(--gray-200);border-radius:20px;width:100%;max-width:920px;display:grid;grid-template-columns:1.1fr .9fr;overflow:hidden;box-shadow:var(--shadow-lg)}
+.login-hero{background:linear-gradient(145deg,#1e3a8a,#1d4ed8);padding:48px 40px;display:flex;flex-direction:column;justify-content:space-between}
+.login-hero h1{font-size:28px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:12px}
+.login-hero h1 span{color:#fbbf24}
+.login-hero p{font-size:14px;color:rgba(255,255,255,.8);line-height:1.7;margin-bottom:32px}
+.hero-feat{display:flex;gap:10px;margin-bottom:12px;font-size:13px;color:rgba(255,255,255,.8)}
+.hero-feat-icon{width:30px;height:30px;background:rgba(255,255,255,.12);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.hero-feat strong{color:#fff;display:block;font-size:12px}
+.hero-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:auto;padding-top:28px}
+.hero-metric{background:rgba(255,255,255,.1);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,.12)}
+.hero-metric .hm-val{font-size:20px;font-weight:800;color:#fbbf24}
+.hero-metric .hm-lbl{font-size:10px;color:rgba(255,255,255,.7);margin-top:2px}
+.login-form{padding:48px 40px;display:flex;flex-direction:column;justify-content:center}
+.login-form h2{font-size:22px;font-weight:800;color:var(--gray-900);margin-bottom:6px}
+.login-form .sub{font-size:13px;color:var(--gray-500);margin-bottom:28px}
+/* ── TABS ── */
+.tab-list{display:flex;gap:0;border-bottom:2px solid var(--gray-200);margin-bottom:20px}
+.tab-btn{padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;color:var(--gray-500);border-bottom:2px solid transparent;margin-bottom:-2px;background:none;border-top:none;border-left:none;border-right:none;transition:all .15s}
+.tab-btn.active{color:var(--orange);border-bottom-color:var(--orange)}
+/* ── PROGRESS ── */
+.progress{height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .4s}
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:48px 24px;color:var(--gray-400)}
+.empty-state .es-icon{font-size:48px;margin-bottom:12px}
+.empty-state h3{font-size:16px;font-weight:700;color:var(--gray-600);margin-bottom:6px}
+.empty-state p{font-size:13px}
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .login-card{grid-template-columns:1fr}
+  .login-hero{display:none}
+  .login-form{padding:32px 24px}
+  .sidebar{transform:translateX(-100%)}
+  .main{margin-left:0}
+  .topbar{left:0}
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.page.active{animation:fadeIn .2s ease}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══════════════════════════════════════════════ -->
+<div id="login-page">
+  <div class="login-card">
+    <div class="login-hero">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:32px">
+          <div class="logo-icon">🏗</div>
+          <div><div class="logo-name" style="color:#fff;font-size:18px">Gestão PRO</div>
+          <div class="logo-sub" style="color:rgba(255,255,255,.6)">ERP Construção Civil</div></div>
+        </div>
+        <h1>Gerencie suas obras<br>com <span>total controle</span></h1>
+        <p>Do orçamento ao recebimento final, tudo em um só lugar.</p>
+        <div class="hero-feat"><div class="hero-feat-icon">🏗</div><div><strong>Gestão de Obras</strong>Diário, equipe, % execução</div></div>
+        <div class="hero-feat"><div class="hero-feat-icon">📋</div><div><strong>Orçamentos</strong>SINAPI, FDE, insumos próprios</div></div>
+        <div class="hero-feat"><div class="hero-feat-icon">💰</div><div><strong>Financeiro Completo</strong>Conta gerencial + provisões</div></div>
+        <div class="hero-feat"><div class="hero-feat-icon">📊</div><div><strong>Relatórios</strong>DRE por obra em tempo real</div></div>
+      </div>
+      <div class="hero-metrics">
+        <div class="hero-metric"><div class="hm-val">+2h</div><div class="hm-lbl">economizadas/dia</div></div>
+        <div class="hero-metric"><div class="hm-val">100%</div><div class="hm-lbl">na nuvem</div></div>
+        <div class="hero-metric"><div class="hm-val">🆓</div><div class="hm-lbl">trial 14 dias</div></div>
+      </div>
+    </div>
+    <div class="login-form">
+      <h2>👋 Bem-vindo de volta</h2>
+      <p class="sub">Entre com seus dados para acessar o sistema</p>
+      <div id="login-error" class="alert alert-red hidden"></div>
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input class="form-input" type="email" id="inp-email" placeholder="seu@email.com" autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Senha</label>
+        <input class="form-input" type="password" id="inp-pwd" placeholder="••••••••"/>
+      </div>
+      <button class="btn btn-orange btn-full btn-lg" id="btn-login" onclick="doLogin()" style="margin-bottom:20px">
+        Entrar no Sistema →
+      </button>
+      <div style="text-align:center;font-size:13px;color:var(--gray-500)">
+        Não tem conta? <a href="#" onclick="showRegister()" style="color:var(--orange);font-weight:700">Criar conta grátis</a>
+      </div>
+      <div style="margin-top:20px;padding:14px;background:var(--gray-50);border-radius:10px;border:1px solid var(--gray-200)">
+        <div style="font-size:11px;font-weight:700;color:var(--gray-500);margin-bottom:8px">⚙️ CONFIGURAÇÃO SUPABASE</div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label class="form-label" style="font-size:10px">Supabase URL</label>
+          <input class="form-input" type="text" id="cfg-url" value="https://orcclbqyzxrahpdpljmp.supabase.co" style="font-size:12px;padding:7px 10px"/>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label class="form-label" style="font-size:10px">Anon Key (Settings → API → anon public)</label>
+          <input class="form-input" type="text" id="cfg-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." style="font-size:11px;padding:7px 10px"/>
+        </div>
+        <button class="btn btn-ghost btn-sm w-full" onclick="saveConfig()" style="justify-content:center">💾 Salvar configuração</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP (pós-login) ══════════════════════════════════ -->
+<div id="app" class="hidden">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🏗</div>
+      <div><div class="logo-name">Gestão PRO</div><div class="logo-sub">Construção Civil</div></div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Principal</div>
+      <div class="nav-item active" onclick="showPage('dashboard')"><span class="ni">📊</span>Dashboard</div>
+      <div class="nav-section">Cadastros</div>
+      <div class="nav-item" onclick="showPage('clientes')"><span class="ni">👥</span>Clientes</div>
+      <div class="nav-item" onclick="showPage('fornecedores')"><span class="ni">🏭</span>Fornecedores</div>
+      <div class="nav-section">Obras</div>
+      <div class="nav-item" onclick="showPage('obras')"><span class="ni">🏗</span>Obras</div>
+      <div class="nav-section">Orçamentos</div>
+      <div class="nav-item" onclick="showPage('orcamentos')"><span class="ni">📋</span>Orçamentos</div>
+      <div class="nav-item" onclick="showPage('insumos')"><span class="ni">🧱</span>Insumos</div>
+      <div class="nav-item" onclick="showPage('composicoes')"><span class="ni">⚙️</span>Composições</div>
+      <div class="nav-section">Financeiro</div>
+      <div class="nav-item" onclick="showPage('financeiro')"><span class="ni">💰</span>Visão Geral</div>
+      <div class="nav-item" onclick="showPage('contas')"><span class="ni">🏦</span>Contas</div>
+      <div class="nav-item" onclick="showPage('lancamentos')"><span class="ni">📝</span>Lançamentos</div>
+      <div class="nav-item" onclick="showPage('provisoes')"><span class="ni">🔒</span>Provisões</div>
+      <div class="nav-section">Sistema</div>
+      <div class="nav-item" onclick="showPage('relatorios')"><span class="ni">📈</span>Relatórios</div>
+      <div class="nav-item" onclick="showPage('configuracoes')"><span class="ni">⚙️</span>Configurações</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="user-av" id="user-av">M</div>
+        <div><div style="font-size:13px;font-weight:700" id="user-name">Carregando...</div>
+        <div style="font-size:11px;color:var(--orange);font-weight:700" id="user-role">admin</div></div>
+        <button onclick="doLogout()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:16px" title="Sair">🚪</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div><div class="topbar-title" id="page-title">Dashboard</div>
+    <div class="topbar-sub" id="page-sub">Visão geral do sistema</div></div>
+    <div style="display:flex;gap:8px" id="topbar-actions"></div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="main"><div class="content" id="page-content">
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px" id="dash-stats"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card"><div class="card-header"><span class="font-bold">🏗 Obras Recentes</span></div>
+        <div class="card-body" id="dash-obras"></div></div>
+        <div class="card"><div class="card-header"><span class="font-bold">💰 Últimos Lançamentos</span></div>
+        <div class="card-body" id="dash-lanc"></div></div>
+      </div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div class="page" id="page-clientes">
+      <div class="card">
+        <div class="card-header">
+          <span class="font-bold">Clientes Cadastrados</span>
+          <button class="btn btn-orange btn-sm" onclick="openModal('modal-cliente')">+ Novo Cliente</button>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap"><table>
+            <thead><tr><th>Nome</th><th>Tipo</th><th>E-mail</th><th>Telefone</th><th>Cidade</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tb-clientes"><tr><td colspan="7" class="text-center text-muted" style="padding:32px">Carregando...</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OBRAS -->
+    <div class="page" id="page-obras">
+      <div class="card">
+        <div class="card-header">
+          <span class="font-bold">Obras</span>
+          <button class="btn btn-orange btn-sm" onclick="openModal('modal-obra')">+ Nova Obra</button>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap"><table>
+            <thead><tr><th>Obra</th><th>Cliente</th><th>Status</th><th>Progresso</th><th>Contrato</th><th>Início</th><th></th></tr></thead>
+            <tbody id="tb-obras"><tr><td colspan="7" class="text-center text-muted" style="padding:32px">Carregando...</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSUMOS -->
+    <div class="page" id="page-insumos">
+      <div class="card">
+        <div class="card-header">
+          <span class="font-bold">Banco de Insumos</span>
+          <button class="btn btn-orange btn-sm" onclick="openModal('modal-insumo')">+ Novo Insumo</button>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap"><table>
+            <thead><tr><th>Código</th><th>Descrição</th><th>Unidade</th><th>Categoria</th><th>Fonte</th><th>Preço Unit.</th><th></th></tr></thead>
+            <tbody id="tb-insumos"><tr><td colspan="7" class="text-center text-muted" style="padding:32px">Carregando...</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORÇAMENTOS -->
+    <div class="page" id="page-orcamentos">
+      <div class="card">
+        <div class="card-header">
+          <span class="font-bold">Orçamentos</span>
+          <button class="btn btn-orange btn-sm" onclick="openModal('modal-orcamento')">+ Novo Orçamento</button>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap"><table>
+            <thead><tr><th>Nº</th><th>Título</th><th>Obra</th><th>Status</th><th>Valor Total</th><th>BDI</th><th>Criado em</th></tr></thead>
+            <tbody id="tb-orcamentos"><tr><td colspan="7" class="text-center text-muted" style="padding:32px">Carregando...</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINANCEIRO -->
+    <div class="page" id="page-financeiro">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px" id="fin-stats"></div>
+      <div class="card"><div class="card-header"><span class="font-bold">Contas por Tipo</span></div>
+      <div class="card-body" id="fin-contas-tipo"></div></div>
+    </div>
+
+    <!-- CONTAS -->
+    <div class="page" id="page-contas">
+      <div class="card">
+        <div class="card-header">
+          <span class="font-bold">Contas Financeiras</span>
+          <button class="btn btn-orange btn-sm" onclick="openModal('modal-conta')">+ Nova Conta</button>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap"><table>
+            <thead><tr><th>Nome</th><th>Tipo</th><th>Banco</th><th>Saldo Inicial</th><th>Saldo Atual</th><th>Status</th></tr></thead>
+            <tbody id="tb-contas"><tr><td colspan="6" class="text-center text-muted" style="padding:32px">Carregando...</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LANÇAMENTOS -->
+    <div class="page" id="page-lancamentos">
+      <div class="card">
+        <div class="card-header">
+          <span class="font-bold">Lançamentos</span>
+          <button class="btn btn-orange btn-sm" onclick="openModal('modal-lancamento')">+ Novo Lançamento</button>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap"><table>
+            <thead><tr><th>Data</th><th>Descrição</th><th>Tipo</th><th>Categoria</th><th>Valor</th><th>Status</th></tr></thead>
+            <tbody id="tb-lancamentos"><tr><td colspan="6" class="text-center text-muted" style="padding:32px">Carregando...</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PÁGINAS SIMPLES -->
+    <div class="page" id="page-fornecedores"><div class="card"><div class="card-header"><span class="font-bold">Fornecedores</span><button class="btn btn-orange btn-sm" onclick="openModal('modal-fornecedor')">+ Novo</button></div><div class="card-body"><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Tipo</th><th>Categoria</th><th>E-mail</th><th>Telefone</th></tr></thead><tbody id="tb-fornecedores"><tr><td colspan="5" class="text-center text-muted" style="padding:32px">Carregando...</td></tr></tbody></table></div></div></div></div>
+    <div class="page" id="page-composicoes"><div class="card"><div class="card-header"><span class="font-bold">Composições</span></div><div class="card-body"><div class="table-wrap"><table><thead><tr><th>Código</th><th>Descrição</th><th>Unidade</th><th>Custo Total</th><th>Fonte</th></tr></thead><tbody id="tb-composicoes"><tr><td colspan="5" class="text-center text-muted" style="padding:32px">Carregando...</td></tr></tbody></table></div></div></div></div>
+    <div class="page" id="page-provisoes"><div class="card"><div class="card-header"><span class="font-bold">Provisões</span></div><div class="card-body"><div class="empty-state"><div class="es-icon">🔒</div><h3>Provisões</h3><p>Trabalhistas, tributárias e marketing.<br>Em breve disponível.</p></div></div></div></div>
+    <div class="page" id="page-relatorios"><div class="card"><div class="card-header"><span class="font-bold">Relatórios</span></div><div class="card-body"><div class="empty-state"><div class="es-icon">📈</div><h3>Relatórios</h3><p>DRE por obra, fluxo de caixa, comparativo.<br>Em breve disponível.</p></div></div></div></div>
+    <div class="page" id="page-configuracoes"><div class="card"><div class="card-header"><span class="font-bold">Configurações</span></div><div class="card-body" id="cfg-body"></div></div></div>
+  </div></main>
+</div>
+
+<!-- ══ MODAIS ══════════════════════════════════════════ -->
+
+<!-- Cliente -->
+<div class="modal-overlay" id="modal-cliente">
+  <div class="modal">
+    <div class="modal-header"><h3>👥 Novo Cliente</h3><button class="modal-close" onclick="closeModal('modal-cliente')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row"><div class="form-group"><label class="form-label">Nome *</label><input class="form-input" id="c-nome" placeholder="Nome completo"/></div>
+      <div class="form-group"><label class="form-label">Tipo</label><select class="form-input" id="c-tipo"><option value="pf">Pessoa Física</option><option value="pj">Pessoa Jurídica</option></select></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">CPF/CNPJ</label><input class="form-input" id="c-doc" placeholder="000.000.000-00"/></div>
+      <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="c-tel" placeholder="(11) 90000-0000"/></div></div>
+      <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="c-email" type="email" placeholder="cliente@email.com"/></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Cidade</label><input class="form-input" id="c-cidade"/></div>
+      <div class="form-group"><label class="form-label">Estado</label><input class="form-input" id="c-estado" placeholder="SP" maxlength="2"/></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-cliente')">Cancelar</button><button class="btn btn-orange" onclick="saveCliente()">✓ Salvar</button></div>
+  </div>
+</div>
+
+<!-- Obra -->
+<div class="modal-overlay" id="modal-obra">
+  <div class="modal">
+    <div class="modal-header"><h3>🏗 Nova Obra</h3><button class="modal-close" onclick="closeModal('modal-obra')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Nome da Obra *</label><input class="form-input" id="o-nome" placeholder="Ex: Residencial Jardins"/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Tipo</label><select class="form-input" id="o-tipo"><option value="residencial">Residencial</option><option value="comercial">Comercial</option><option value="industrial">Industrial</option><option value="reforma">Reforma</option><option value="infraestrutura">Infraestrutura</option></select></div>
+        <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="o-status"><option value="prospeccao">Prospecção</option><option value="orcamento">Orçamento</option><option value="contratada">Contratada</option><option value="em_andamento">Em Andamento</option></select></div>
+      </div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Valor do Contrato (R$)</label><input class="form-input" id="o-valor" type="number" placeholder="0,00"/></div>
+      <div class="form-group"><label class="form-label">Área (m²)</label><input class="form-input" id="o-area" type="number" placeholder="0"/></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Início Previsto</label><input class="form-input" id="o-inicio" type="date"/></div>
+      <div class="form-group"><label class="form-label">Fim Previsto</label><input class="form-input" id="o-fim" type="date"/></div></div>
+      <div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="o-end" placeholder="Rua, número, bairro"/></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-obra')">Cancelar</button><button class="btn btn-orange" onclick="saveObra()">✓ Salvar</button></div>
+  </div>
+</div>
+
+<!-- Insumo -->
+<div class="modal-overlay" id="modal-insumo">
+  <div class="modal">
+    <div class="modal-header"><h3>🧱 Novo Insumo</h3><button class="modal-close" onclick="closeModal('modal-insumo')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row"><div class="form-group"><label class="form-label">Código</label><input class="form-input" id="i-cod" placeholder="INS-001"/></div>
+      <div class="form-group"><label class="form-label">Unidade *</label><input class="form-input" id="i-un" placeholder="m², kg, un, m..."/></div></div>
+      <div class="form-group"><label class="form-label">Descrição *</label><input class="form-input" id="i-desc" placeholder="Ex: Cimento CP-II 50kg"/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Categoria</label><select class="form-input" id="i-cat"><option value="material">Material</option><option value="mao_de_obra">Mão de Obra</option><option value="equipamento">Equipamento</option><option value="servico">Serviço</option></select></div>
+        <div class="form-group"><label class="form-label">Fonte</label><select class="form-input" id="i-fonte"><option value="proprio">Próprio</option><option value="sinapi">SINAPI</option><option value="fde">FDE</option><option value="orse">ORSE</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Preço Unitário (R$) *</label><input class="form-input" id="i-preco" type="number" step="0.01" placeholder="0,00"/></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-insumo')">Cancelar</button><button class="btn btn-orange" onclick="saveInsumo()">✓ Salvar</button></div>
+  </div>
+</div>
+
+<!-- Conta -->
+<div class="modal-overlay" id="modal-conta">
+  <div class="modal">
+    <div class="modal-header"><h3>🏦 Nova Conta</h3><button class="modal-close" onclick="closeModal('modal-conta')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Nome da Conta *</label><input class="form-input" id="ct-nome" placeholder="Ex: Conta Gerencial Itaú"/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Tipo *</label><select class="form-input" id="ct-tipo"><option value="gerencial">Conta Gerencial</option><option value="operacional">Conta Operacional</option><option value="fluxo_fixo">Fluxo Fixo</option><option value="provisao">Provisões</option><option value="lucro_excedente">Lucro Excedente</option><option value="caixa">Caixa</option></select></div>
+        <div class="form-group"><label class="form-label">Banco</label><input class="form-input" id="ct-banco" placeholder="Itaú, BB, Caixa..."/></div>
+      </div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Agência</label><input class="form-input" id="ct-ag" placeholder="0000"/></div>
+      <div class="form-group"><label class="form-label">Nº Conta</label><input class="form-input" id="ct-num" placeholder="00000-0"/></div></div>
+      <div class="form-group"><label class="form-label">Saldo Inicial (R$)</label><input class="form-input" id="ct-saldo" type="number" step="0.01" value="0"/></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-conta')">Cancelar</button><button class="btn btn-orange" onclick="saveConta()">✓ Salvar</button></div>
+  </div>
+</div>
+
+<!-- Lançamento -->
+<div class="modal-overlay" id="modal-lancamento">
+  <div class="modal">
+    <div class="modal-header"><h3>📝 Novo Lançamento</h3><button class="modal-close" onclick="closeModal('modal-lancamento')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Tipo *</label><select class="form-input" id="l-tipo"><option value="receita">Receita</option><option value="despesa">Despesa</option><option value="provisao">Provisão</option><option value="transferencia">Transferência</option></select></div>
+        <div class="form-group"><label class="form-label">Valor (R$) *</label><input class="form-input" id="l-valor" type="number" step="0.01" placeholder="0,00"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Descrição *</label><input class="form-input" id="l-desc" placeholder="Descrição do lançamento"/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Categoria</label><input class="form-input" id="l-cat" placeholder="Materiais, Mão de Obra..."/></div>
+        <div class="form-group"><label class="form-label">Data</label><input class="form-input" id="l-data" type="date"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Conta *</label><select class="form-input" id="l-conta"><option value="">Selecione...</option></select></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="l-status"><option value="pendente">Pendente</option><option value="pago">Pago</option><option value="recebido">Recebido</option></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-lancamento')">Cancelar</button><button class="btn btn-orange" onclick="saveLancamento()">✓ Salvar</button></div>
+  </div>
+</div>
+
+<!-- Fornecedor -->
+<div class="modal-overlay" id="modal-fornecedor">
+  <div class="modal">
+    <div class="modal-header"><h3>🏭 Novo Fornecedor</h3><button class="modal-close" onclick="closeModal('modal-fornecedor')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Nome *</label><input class="form-input" id="f-nome" placeholder="Razão social ou nome"/></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Tipo</label><select class="form-input" id="f-tipo"><option value="pj">PJ</option><option value="pf">PF</option></select></div>
+      <div class="form-group"><label class="form-label">Categoria</label><input class="form-input" id="f-cat" placeholder="Materiais, Serviços..."/></div></div>
+      <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="f-email" type="email" placeholder="fornecedor@email.com"/></div>
+      <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="f-tel" placeholder="(11) 90000-0000"/></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-fornecedor')">Cancelar</button><button class="btn btn-orange" onclick="saveFornecedor()">✓ Salvar</button></div>
+  </div>
+</div>
+
+<!-- Orçamento -->
+<div class="modal-overlay" id="modal-orcamento">
+  <div class="modal">
+    <div class="modal-header"><h3>📋 Novo Orçamento</h3><button class="modal-close" onclick="closeModal('modal-orcamento')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Título *</label><input class="form-input" id="orc-titulo" placeholder="Ex: Residencial Jardins — Orçamento 01"/></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">BDI (%)</label><input class="form-input" id="orc-bdi" type="number" step="0.1" placeholder="25"/></div>
+      <div class="form-group"><label class="form-label">Validade (dias)</label><input class="form-input" id="orc-val" type="number" placeholder="30"/></div></div>
+      <div class="form-group"><label class="form-label">Descrição</label><textarea class="form-input" id="orc-desc" rows="2" placeholder="Descrição do orçamento..."></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-orcamento')">Cancelar</button><button class="btn btn-orange" onclick="saveOrcamento()">✓ Salvar</button></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:24px;right:24px;z-index:999;display:none;background:#1f2937;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.2);max-width:340px"></div>
+
+<script>
+// ── CONFIG & SUPABASE ─────────────────────────────────────
+let supabase_client = null
+let current_user    = null
+let empresa_id      = null
+
+function initSupabase(){
+  const url = localStorage.getItem('sb_url') || document.getElementById('cfg-url')?.value
+  const key = localStorage.getItem('sb_key') || document.getElementById('cfg-key')?.value
+  if(!url || !key || key.length < 30) return false
+  supabase_client = supabase.createClient(url, key)
+  return true
+}
+
+function saveConfig(){
+  const url = document.getElementById('cfg-url').value.trim()
+  const key = document.getElementById('cfg-key').value.trim()
+  if(!url || !key){ toast('⚠️ Preencha URL e Anon Key','red'); return }
+  localStorage.setItem('sb_url', url)
+  localStorage.setItem('sb_key', key)
+  supabase_client = supabase.createClient(url, key)
+  toast('✅ Configuração salva! Faça login agora.','green')
+}
+
+// Carrega configuração salva
+window.addEventListener('load', ()=>{
+  const url = localStorage.getItem('sb_url')
+  const key = localStorage.getItem('sb_key')
+  if(url) document.getElementById('cfg-url').value = url
+  if(key) document.getElementById('cfg-key').value = key
+  if(url && key){ initSupabase(); checkSession() }
+  // Define data de hoje nos inputs de data
+  const hoje = new Date().toISOString().split('T')[0]
+  document.querySelectorAll('input[type=date]').forEach(el=>el.value=hoje)
+})
+
+async function checkSession(){
+  if(!supabase_client) return
+  const { data:{ session } } = await supabase_client.auth.getSession()
+  if(session){ await afterLogin(session.user); }
+}
+
+// ── AUTH ─────────────────────────────────────────────────
+async function doLogin(){
+  if(!initSupabase()){ toast('⚠️ Configure a Anon Key do Supabase primeiro','red'); return }
+  const email = document.getElementById('inp-email').value.trim()
+  const pwd   = document.getElementById('inp-pwd').value
+  const btn   = document.getElementById('btn-login')
+  const err   = document.getElementById('login-error')
+  if(!email||!pwd){ showErr(err,'Preencha e-mail e senha.'); return }
+  err.classList.add('hidden')
+  btn.disabled=true; btn.textContent='⏳ Verificando...'
+  const { data, error } = await supabase_client.auth.signInWithPassword({ email, password:pwd })
+  if(error){ showErr(err, error.message); btn.disabled=false; btn.textContent='Entrar no Sistema →'; return }
+  await afterLogin(data.user)
+}
+
+async function afterLogin(user){
+  current_user = user
+  // Busca perfil
+  const { data:perfil } = await supabase_client.from('perfis').select('*,empresas(*)').eq('id', user.id).single()
+  if(perfil){
+    empresa_id = perfil.empresa_id
+    document.getElementById('user-name').textContent = perfil.nome || user.email
+    document.getElementById('user-role').textContent  = perfil.role?.toUpperCase() || 'ADMIN'
+    document.getElementById('user-av').textContent    = (perfil.nome||user.email)[0].toUpperCase()
+  } else {
+    document.getElementById('user-name').textContent = user.email
+  }
+  document.getElementById('login-page').classList.add('hidden')
+  document.getElementById('app').classList.remove('hidden')
+  loadDashboard()
+}
+
+async function doLogout(){
+  if(supabase_client) await supabase_client.auth.signOut()
+  document.getElementById('app').classList.add('hidden')
+  document.getElementById('login-page').classList.remove('hidden')
+  current_user = null; empresa_id = null
+}
+
+function showRegister(){ toast('Use o link da página de cadastro ou crie o usuário direto no Supabase Dashboard → Authentication → Users', 'orange') }
+
+// ── NAVEGAÇÃO ─────────────────────────────────────────────
+const pageTitles = {
+  dashboard:{t:'Dashboard',s:'Visão geral do sistema'},
+  clientes:{t:'Clientes',s:'Gestão de clientes'},
+  fornecedores:{t:'Fornecedores',s:'Gestão de fornecedores'},
+  obras:{t:'Obras',s:'Gestão de obras'},
+  insumos:{t:'Insumos',s:'Banco de insumos'},
+  composicoes:{t:'Composições',s:'Composições de insumos'},
+  orcamentos:{t:'Orçamentos',s:'Elaboração de orçamentos'},
+  financeiro:{t:'Financeiro',s:'Visão geral financeira'},
+  contas:{t:'Contas',s:'Contas financeiras'},
+  lancamentos:{t:'Lançamentos',s:'Receitas, despesas e provisões'},
+  provisoes:{t:'Provisões',s:'Controle de provisões'},
+  relatorios:{t:'Relatórios',s:'Análises e relatórios'},
+  configuracoes:{t:'Configurações',s:'Configurações do sistema'},
+}
+
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'))
+  document.getElementById('page-'+name)?.classList.add('active')
+  document.querySelectorAll('.nav-item').forEach(n=>{ if(n.getAttribute('onclick')?.includes("'"+name+"'")) n.classList.add('active') })
+  const pg = pageTitles[name]||{t:name,s:''}
+  document.getElementById('page-title').textContent  = pg.t
+  document.getElementById('page-sub').textContent    = pg.s
+  document.getElementById('topbar-actions').innerHTML = ''
+  // Carrega dados da página
+  const loaders = {clientes:loadClientes, obras:loadObras, insumos:loadInsumos, fornecedores:loadFornecedores, composicoes:loadComposicoes, orcamentos:loadOrcamentos, contas:loadContas, lancamentos:loadLancamentos, financeiro:loadFinanceiro, configuracoes:loadConfig}
+  if(loaders[name]) loaders[name]()
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────
+async function loadDashboard(){
+  if(!empresa_id) return
+  // Stats
+  const [obras, clientes, lanc, contas] = await Promise.all([
+    supabase_client.from('obras').select('*',{count:'exact'}).eq('empresa_id',empresa_id),
+    supabase_client.from('clientes').select('*',{count:'exact'}).eq('empresa_id',empresa_id),
+    supabase_client.from('lancamentos').select('valor,tipo,status').eq('empresa_id',empresa_id),
+    supabase_client.from('contas_financeiras').select('saldo_atual,tipo').eq('empresa_id',empresa_id),
+  ])
+  const receitas = (lanc.data||[]).filter(l=>l.tipo==='receita'&&l.status==='recebido').reduce((s,l)=>s+Number(l.valor),0)
+  const despesas = (lanc.data||[]).filter(l=>l.tipo==='despesa'&&l.status==='pago').reduce((s,l)=>s+Number(l.valor),0)
+  const saldo    = (contas.data||[]).reduce((s,c)=>s+Number(c.saldo_atual),0)
+  document.getElementById('dash-stats').innerHTML = [
+    {icon:'🏗',val:obras.count||0,label:'Obras Ativas',sub:'total cadastradas',cor:'#1d4ed8',bg:'#eff6ff'},
+    {icon:'👥',val:clientes.count||0,label:'Clientes',sub:'cadastrados',cor:'#16a34a',bg:'#f0fdf4'},
+    {icon:'💰',val:'R$'+fmt(receitas),label:'Receitas',sub:'confirmadas',cor:'#16a34a',bg:'#f0fdf4'},
+    {icon:'📊',val:'R$'+fmt(saldo),label:'Saldo Total',sub:'todas as contas',cor:saldo>=0?'#16a34a':'#dc2626',bg:saldo>=0?'#f0fdf4':'#fef2f2'},
+  ].map(s=>`<div class="stat-card"><div class="stat-icon" style="background:${s.bg};color:${s.cor}">${s.icon}</div>
+    <div class="stat-val" style="color:${s.cor}">${s.val}</div>
+    <div class="stat-label">${s.label}</div>
+    <div class="stat-change text-muted">${s.sub}</div></div>`).join('')
+  // Obras recentes
+  const { data:obrasList } = await supabase_client.from('obras').select('nome,status,percentual_exec,valor_contrato').eq('empresa_id',empresa_id).order('criado_em',{ascending:false}).limit(5)
+  document.getElementById('dash-obras').innerHTML = obrasList?.length ? obrasList.map(o=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--gray-100)">
+      <div><div class="font-semibold text-sm">${o.nome}</div>
+      <div class="text-xs text-muted">${o.percentual_exec||0}% executado</div></div>
+      <span class="badge badge-${statusColor(o.status)}">${statusLabel(o.status)}</span>
+    </div>`).join('')
+    : '<div class="empty-state"><div class="es-icon">🏗</div><h3>Sem obras</h3><p>Cadastre sua primeira obra</p></div>'
+  // Lançamentos recentes
+  const { data:lancList } = await supabase_client.from('lancamentos').select('descricao,valor,tipo,status,data_lancamento').eq('empresa_id',empresa_id).order('criado_em',{ascending:false}).limit(5)
+  document.getElementById('dash-lanc').innerHTML = lancList?.length ? lancList.map(l=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--gray-100)">
+      <div><div class="font-semibold text-sm">${l.descricao}</div>
+      <div class="text-xs text-muted">${l.data_lancamento}</div></div>
+      <div style="text-align:right">
+        <div class="font-bold text-sm" style="color:${l.tipo==='receita'?'#16a34a':'#dc2626'}">${l.tipo==='receita'?'+':'-'}R$${fmt(l.valor)}</div>
+        <span class="badge badge-${l.status==='pago'||l.status==='recebido'?'green':'yellow'}">${l.status}</span>
+      </div>
+    </div>`).join('')
+    : '<div class="empty-state"><div class="es-icon">📝</div><h3>Sem lançamentos</h3><p>Cadastre receitas e despesas</p></div>'
+}
+
+// ── CARREGADORES ──────────────────────────────────────────
+async function loadClientes(){
+  const {data} = await supabase_client.from('clientes').select('*').eq('empresa_id',empresa_id).order('nome')
+  document.getElementById('tb-clientes').innerHTML = data?.length
+    ? data.map(c=>`<tr><td><strong>${c.nome}</strong></td><td><span class="badge badge-${c.tipo==='pj'?'blue':'green'}">${c.tipo.toUpperCase()}</span></td>
+      <td>${c.email||'—'}</td><td>${c.telefone||c.celular||'—'}</td><td>${c.cidade||'—'}</td>
+      <td><span class="badge badge-green">Ativo</span></td>
+      <td><button class="btn btn-red btn-sm" onclick="delRec('clientes','${c.id}',loadClientes)">Excluir</button></td></tr>`).join('')
+    : '<tr><td colspan="7"><div class="empty-state"><div class="es-icon">👥</div><h3>Nenhum cliente</h3><p>Clique em "Novo Cliente" para começar</p></div></td></tr>'
+}
+async function loadFornecedores(){
+  const {data} = await supabase_client.from('fornecedores').select('*').eq('empresa_id',empresa_id).order('nome')
+  document.getElementById('tb-fornecedores').innerHTML = data?.length
+    ? data.map(f=>`<tr><td><strong>${f.nome}</strong></td><td>${f.tipo.toUpperCase()}</td><td>${f.categoria||'—'}</td><td>${f.email||'—'}</td><td>${f.telefone||'—'}</td></tr>`).join('')
+    : '<tr><td colspan="5"><div class="empty-state"><div class="es-icon">🏭</div><h3>Nenhum fornecedor</h3></div></td></tr>'
+}
+async function loadObras(){
+  const {data} = await supabase_client.from('obras').select('*').eq('empresa_id',empresa_id).order('criado_em',{ascending:false})
+  document.getElementById('tb-obras').innerHTML = data?.length
+    ? data.map(o=>`<tr>
+      <td><strong>${o.nome}</strong><div class="text-xs text-muted">${o.tipo}</div></td>
+      <td>—</td>
+      <td><span class="badge badge-${statusColor(o.status)}">${statusLabel(o.status)}</span></td>
+      <td><div class="progress" style="min-width:80px"><div class="progress-fill" style="width:${o.percentual_exec||0}%;background:var(--green)"></div></div>
+      <div class="text-xs text-muted">${o.percentual_exec||0}%</div></td>
+      <td>R$ ${fmt(o.valor_contrato||0)}</td>
+      <td>${o.data_inicio_prev||'—'}</td>
+      <td><button class="btn btn-red btn-sm" onclick="delRec('obras','${o.id}',loadObras)">Excluir</button></td></tr>`).join('')
+    : '<tr><td colspan="7"><div class="empty-state"><div class="es-icon">🏗</div><h3>Nenhuma obra</h3><p>Clique em "+ Nova Obra"</p></div></td></tr>'
+}
+async function loadInsumos(){
+  const {data} = await supabase_client.from('insumos').select('*').or(`empresa_id.eq.${empresa_id},empresa_id.is.null`).order('descricao').limit(200)
+  document.getElementById('tb-insumos').innerHTML = data?.length
+    ? data.map(i=>`<tr><td class="text-muted">${i.codigo||'—'}</td><td><strong>${i.descricao}</strong></td><td>${i.unidade}</td>
+      <td>${i.categoria||'—'}</td><td><span class="badge badge-${i.fonte==='sinapi'?'blue':'gray'}">${i.fonte}</span></td>
+      <td class="font-bold">R$ ${fmt4(i.preco_unitario)}</td>
+      <td>${i.empresa_id?`<button class="btn btn-red btn-sm" onclick="delRec('insumos','${i.id}',loadInsumos)">Excluir</button>`:'<span class="text-xs text-muted">Base pública</span>'}</td></tr>`).join('')
+    : '<tr><td colspan="7"><div class="empty-state"><div class="es-icon">🧱</div><h3>Nenhum insumo</h3></div></td></tr>'
+}
+async function loadComposicoes(){
+  const {data} = await supabase_client.from('composicoes').select('*').or(`empresa_id.eq.${empresa_id},empresa_id.is.null`).order('descricao')
+  document.getElementById('tb-composicoes').innerHTML = data?.length
+    ? data.map(c=>`<tr><td>${c.codigo||'—'}</td><td><strong>${c.descricao}</strong></td><td>${c.unidade}</td>
+      <td class="font-bold">R$ ${fmt4(c.custo_total)}</td><td><span class="badge badge-gray">${c.fonte}</span></td></tr>`).join('')
+    : '<tr><td colspan="5"><div class="empty-state"><div class="es-icon">⚙️</div><h3>Nenhuma composição</h3></div></td></tr>'
+}
+async function loadOrcamentos(){
+  const {data} = await supabase_client.from('orcamentos').select('*').eq('empresa_id',empresa_id).order('criado_em',{ascending:false})
+  document.getElementById('tb-orcamentos').innerHTML = data?.length
+    ? data.map(o=>`<tr><td>${o.numero||'—'}</td><td><strong>${o.titulo}</strong></td><td>—</td>
+      <td><span class="badge badge-${o.status==='aprovado'?'green':o.status==='reprovado'?'red':'yellow'}">${o.status}</span></td>
+      <td class="font-bold">R$ ${fmt(o.valor_total||0)}</td><td>${o.bdi||0}%</td>
+      <td>${o.criado_em?.split('T')[0]||'—'}</td></tr>`).join('')
+    : '<tr><td colspan="7"><div class="empty-state"><div class="es-icon">📋</div><h3>Nenhum orçamento</h3></div></td></tr>'
+}
+async function loadContas(){
+  const {data} = await supabase_client.from('contas_financeiras').select('*').eq('empresa_id',empresa_id).order('tipo')
+  document.getElementById('tb-contas').innerHTML = data?.length
+    ? data.map(c=>`<tr><td><strong>${c.nome}</strong></td>
+      <td><span class="badge badge-blue">${tipoContaLabel(c.tipo)}</span></td>
+      <td>${c.banco||'—'}</td><td>R$ ${fmt(c.saldo_inicial||0)}</td>
+      <td class="font-bold" style="color:${(c.saldo_atual||0)>=0?'#16a34a':'#dc2626'}">R$ ${fmt(c.saldo_atual||0)}</td>
+      <td><span class="badge badge-green">Ativa</span></td></tr>`).join('')
+    : '<tr><td colspan="6"><div class="empty-state"><div class="es-icon">🏦</div><h3>Nenhuma conta</h3><p>Clique em "+ Nova Conta"</p></div></td></tr>'
+}
+async function loadLancamentos(){
+  const {data} = await supabase_client.from('lancamentos').select('*').eq('empresa_id',empresa_id).order('data_lancamento',{ascending:false}).limit(100)
+  // Popula select de contas
+  const {data:contas} = await supabase_client.from('contas_financeiras').select('id,nome').eq('empresa_id',empresa_id)
+  const sel = document.getElementById('l-conta')
+  sel.innerHTML = '<option value="">Selecione a conta...</option>'+(contas||[]).map(c=>`<option value="${c.id}">${c.nome}</option>`).join('')
+  document.getElementById('tb-lancamentos').innerHTML = data?.length
+    ? data.map(l=>`<tr>
+      <td>${l.data_lancamento}</td>
+      <td><strong>${l.descricao}</strong>${l.categoria?`<div class="text-xs text-muted">${l.categoria}</div>`:''}</td>
+      <td><span class="badge badge-${l.tipo==='receita'?'green':l.tipo==='despesa'?'red':'yellow'}">${l.tipo}</span></td>
+      <td>${l.categoria||'—'}</td>
+      <td class="font-bold" style="color:${l.tipo==='receita'?'#16a34a':'#dc2626'}">${l.tipo==='receita'?'+':'-'}R$ ${fmt(l.valor)}</td>
+      <td><span class="badge badge-${l.status==='pago'||l.status==='recebido'?'green':'yellow'}">${l.status}</span></td></tr>`).join('')
+    : '<tr><td colspan="6"><div class="empty-state"><div class="es-icon">📝</div><h3>Nenhum lançamento</h3></div></td></tr>'
+}
+async function loadFinanceiro(){
+  const {data} = await supabase_client.from('contas_financeiras').select('*').eq('empresa_id',empresa_id)
+  const tipos = ['gerencial','operacional','fluxo_fixo','provisao','lucro_excedente','caixa']
+  const resumo = tipos.map(t=>({tipo:t,contas:(data||[]).filter(c=>c.tipo===t),saldo:(data||[]).filter(c=>c.tipo===t).reduce((s,c)=>s+Number(c.saldo_atual||0),0)}))
+  const total = resumo.reduce((s,r)=>s+r.saldo,0)
+  document.getElementById('fin-stats').innerHTML = [
+    {icon:'💰',val:'R$'+fmt(total),label:'Saldo Total',cor:'#1d4ed8',bg:'#eff6ff'},
+    {icon:'📈',val:(data||[]).filter(c=>c.tipo==='gerencial').reduce((s,c)=>s+Number(c.saldo_atual||0),0),label:'Conta Gerencial',moeda:true,cor:'#16a34a',bg:'#f0fdf4'},
+    {icon:'🔒',val:(data||[]).filter(c=>c.tipo==='provisao').reduce((s,c)=>s+Number(c.saldo_atual||0),0),label:'Provisões',moeda:true,cor:'#d97706',bg:'#fffbeb'},
+  ].map(s=>`<div class="stat-card"><div class="stat-icon" style="background:${s.bg};color:${s.cor}">${s.icon}</div>
+    <div class="stat-val" style="color:${s.cor}">${s.moeda?'R$'+fmt(s.val):s.val}</div>
+    <div class="stat-label">${s.label}</div></div>`).join('')
+  document.getElementById('fin-contas-tipo').innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">`+resumo.map(r=>`
+    <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:16px">
+      <div class="text-xs text-muted font-bold" style="text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">${tipoContaLabel(r.tipo)}</div>
+      <div class="font-bold text-lg" style="color:${r.saldo>=0?'#16a34a':'#dc2626'}">R$ ${fmt(r.saldo)}</div>
+      <div class="text-xs text-muted">${r.contas.length} conta${r.contas.length!==1?'s':''}</div>
+    </div>`).join('')+'</div>'
+}
+function loadConfig(){
+  document.getElementById('cfg-body').innerHTML = `
+    <div style="max-width:480px">
+      <div style="font-weight:800;margin-bottom:16px;font-size:15px">⚙️ Conexão com Supabase</div>
+      <div class="form-group"><label class="form-label">Supabase URL</label>
+        <input class="form-input" id="cfg2-url" value="${localStorage.getItem('sb_url')||''}"/></div>
+      <div class="form-group"><label class="form-label">Anon Key</label>
+        <input class="form-input" id="cfg2-key" value="${localStorage.getItem('sb_key')||''}"/></div>
+      <button class="btn btn-orange" onclick="saveConfig2()">💾 Salvar</button>
+    </div>`
+}
+function saveConfig2(){
+  const url = document.getElementById('cfg2-url').value.trim()
+  const key = document.getElementById('cfg2-key').value.trim()
+  localStorage.setItem('sb_url',url); localStorage.setItem('sb_key',key)
+  supabase_client = supabase.createClient(url,key)
+  toast('✅ Configuração atualizada!','green')
+}
+
+// ── SAVES ─────────────────────────────────────────────────
+async function saveCliente(){
+  const payload={empresa_id,nome:v('c-nome'),tipo:v('c-tipo'),cpf_cnpj:v('c-doc'),telefone:v('c-tel'),email:v('c-email'),cidade:v('c-cidade'),estado:v('c-estado')}
+  if(!payload.nome){ toast('⚠️ Nome obrigatório','red'); return }
+  const {error} = await supabase_client.from('clientes').insert(payload)
+  if(error){ toast('❌ '+error.message,'red'); return }
+  toast('✅ Cliente salvo!','green'); closeModal('modal-cliente'); loadClientes()
+}
+async function saveObra(){
+  const payload={empresa_id,nome:v('o-nome'),tipo:v('o-tipo'),status:v('o-status'),valor_contrato:Number(v('o-valor'))||0,area_total:Number(v('o-area'))||null,data_inicio_prev:v('o-inicio')||null,data_fim_prev:v('o-fim')||null,endereco:v('o-end')}
+  if(!payload.nome){ toast('⚠️ Nome da obra obrigatório','red'); return }
+  const {error} = await supabase_client.from('obras').insert(payload)
+  if(error){ toast('❌ '+error.message,'red'); return }
+  toast('✅ Obra salva!','green'); closeModal('modal-obra'); loadObras()
+}
+async function saveInsumo(){
+  const payload={empresa_id,codigo:v('i-cod'),descricao:v('i-desc'),unidade:v('i-un'),categoria:v('i-cat'),fonte:v('i-fonte'),preco_unitario:Number(v('i-preco'))||0}
+  if(!payload.descricao||!payload.unidade){ toast('⚠️ Descrição e unidade obrigatórios','red'); return }
+  const {error} = await supabase_client.from('insumos').insert(payload)
+  if(error){ toast('❌ '+error.message,'red'); return }
+  toast('✅ Insumo salvo!','green'); closeModal('modal-insumo'); loadInsumos()
+}
+async function saveConta(){
+  const payload={empresa_id,nome:v('ct-nome'),tipo:v('ct-tipo'),banco:v('ct-banco'),agencia:v('ct-ag'),numero_conta:v('ct-num'),saldo_inicial:Number(v('ct-saldo'))||0,saldo_atual:Number(v('ct-saldo'))||0}
+  if(!payload.nome){ toast('⚠️ Nome da conta obrigatório','red'); return }
+  const {error} = await supabase_client.from('contas_financeiras').insert(payload)
+  if(error){ toast('❌ '+error.message,'red'); return }
+  toast('✅ Conta salva!','green'); closeModal('modal-conta'); loadContas()
+}
+async function saveLancamento(){
+  const payload={empresa_id,tipo:v('l-tipo'),valor:Number(v('l-valor'))||0,descricao:v('l-desc'),categoria:v('l-cat'),data_lancamento:v('l-data')||new Date().toISOString().split('T')[0],conta_id:v('l-conta'),status:v('l-status')}
+  if(!payload.descricao||!payload.conta_id||!payload.valor){ toast('⚠️ Preencha descrição, conta e valor','red'); return }
+  const {error} = await supabase_client.from('lancamentos').insert(payload)
+  if(error){ toast('❌ '+error.message,'red'); return }
+  toast('✅ Lançamento salvo!','green'); closeModal('modal-lancamento'); loadLancamentos()
+}
+async function saveFornecedor(){
+  const payload={empresa_id,nome:v('f-nome'),tipo:v('f-tipo'),categoria:v('f-cat'),email:v('f-email'),telefone:v('f-tel')}
+  if(!payload.nome){ toast('⚠️ Nome obrigatório','red'); return }
+  const {error} = await supabase_client.from('fornecedores').insert(payload)
+  if(error){ toast('❌ '+error.message,'red'); return }
+  toast('✅ Fornecedor salvo!','green'); closeModal('modal-fornecedor'); loadFornecedores()
+}
+async function saveOrcamento(){
+  const payload={empresa_id,titulo:v('orc-titulo'),descricao:v('orc-desc'),bdi:Number(v('orc-bdi'))||0,validade_dias:Number(v('orc-val'))||30,status:'rascunho'}
+  if(!payload.titulo){ toast('⚠️ Título obrigatório','red'); return }
+  const {error} = await supabase_client.from('orcamentos').insert(payload)
+  if(error){ toast('❌ '+error.message,'red'); return }
+  toast('✅ Orçamento salvo!','green'); closeModal('modal-orcamento'); loadOrcamentos()
+}
+async function delRec(table, id, reload){
+  if(!confirm('Confirma exclusão?')) return
+  const {error} = await supabase_client.from(table).delete().eq('id',id)
+  if(error){ toast('❌ '+error.message,'red'); return }
+  toast('✅ Excluído!','green'); reload()
+}
+
+// ── MODAL ─────────────────────────────────────────────────
+function openModal(id){ document.getElementById(id).classList.add('open') }
+function closeModal(id){ document.getElementById(id).classList.remove('open') }
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open') }))
+
+// ── TOAST ─────────────────────────────────────────────────
+function toast(msg, type='green'){
+  const el = document.getElementById('toast')
+  el.textContent = msg
+  el.style.display = 'block'
+  el.style.background = type==='green'?'#166534':type==='red'?'#991b1b':'#92400e'
+  clearTimeout(el._t); el._t = setTimeout(()=>el.style.display='none', 3500)
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function v(id){ return document.getElementById(id)?.value||'' }
+function fmt(n){ return Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) }
+function fmt4(n){ return Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:4}) }
+function showErr(el,msg){ el.textContent='❌ '+msg; el.classList.remove('hidden') }
+function statusLabel(s){ return {prospeccao:'Prospecção',orcamento:'Orçamento',contratada:'Contratada',em_andamento:'Em Andamento',paralisada:'Paralisada',concluida:'Concluída',cancelada:'Cancelada'}[s]||s }
+function statusColor(s){ return {prospeccao:'gray',orcamento:'yellow',contratada:'blue',em_andamento:'orange',paralisada:'red',concluida:'green',cancelada:'red'}[s]||'gray' }
+function tipoContaLabel(t){ return {gerencial:'Conta Gerencial',operacional:'Conta Operacional',fluxo_fixo:'Fluxo Fixo',provisao:'Provisões',lucro_excedente:'Lucro Excedente',caixa:'Caixa'}[t]||t }
+</script>
+</body>
+</html>
