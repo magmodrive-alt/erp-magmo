@@ -189,11 +189,11 @@ td{padding:12px 14px;vertical-align:middle}
       <div id="login-error" class="alert alert-red hidden"></div>
       <div class="form-group">
         <label class="form-label">E-mail</label>
-        <input class="form-input" type="email" id="inp-email" placeholder="seu@email.com" autocomplete="email"/>
+        <input class="form-input" type="email" id="inp-email" placeholder="seu@email.com" autocomplete="email" value=""/>
       </div>
       <div class="form-group">
         <label class="form-label">Senha</label>
-        <input class="form-input" type="password" id="inp-pwd" placeholder="••••••••"/>
+        <input class="form-input" type="password" id="inp-pwd" placeholder="••••••••" value="" autocomplete="current-password"/>
       </div>
       <button class="btn btn-orange btn-full btn-lg" id="btn-login" onclick="doLogin()" style="margin-bottom:20px">
         Entrar no Sistema →
@@ -201,17 +201,9 @@ td{padding:12px 14px;vertical-align:middle}
       <div style="text-align:center;font-size:13px;color:var(--gray-500)">
         Não tem conta? <a href="#" onclick="showRegister()" style="color:var(--orange);font-weight:700">Criar conta grátis</a>
       </div>
-      <div style="margin-top:20px;padding:14px;background:var(--gray-50);border-radius:10px;border:1px solid var(--gray-200)">
-        <div style="font-size:11px;font-weight:700;color:var(--gray-500);margin-bottom:8px">⚙️ CONFIGURAÇÃO SUPABASE</div>
-        <div class="form-group" style="margin-bottom:10px">
-          <label class="form-label" style="font-size:10px">Supabase URL</label>
-          <input class="form-input" type="text" id="cfg-url" value="https://orcclbqyzxrahpdpljmp.supabase.co" style="font-size:12px;padding:7px 10px"/>
-        </div>
-        <div class="form-group" style="margin-bottom:10px">
-          <label class="form-label" style="font-size:10px">Anon Key (Settings → API → anon public)</label>
-          <input class="form-input" type="text" id="cfg-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." style="font-size:11px;padding:7px 10px"/>
-        </div>
-        <button class="btn btn-ghost btn-sm w-full" onclick="saveConfig()" style="justify-content:center">💾 Salvar configuração</button>
+      <div id="setup-banner" style="margin-top:20px;padding:14px;background:#fef3c7;border-radius:10px;border:1px solid #fde68a;display:none">
+        <div style="font-size:12px;font-weight:700;color:#92400e;margin-bottom:6px">⚙️ Primeira vez? Configure a conexão</div>
+        <div style="font-size:12px;color:#78350f">Acesse <strong>Configurações → Conexão</strong> após entrar para definir o banco de dados.</div>
       </div>
     </div>
   </div>
@@ -384,7 +376,23 @@ td{padding:12px 14px;vertical-align:middle}
     <div class="page" id="page-composicoes"><div class="card"><div class="card-header"><span class="font-bold">Composições</span></div><div class="card-body"><div class="table-wrap"><table><thead><tr><th>Código</th><th>Descrição</th><th>Unidade</th><th>Custo Total</th><th>Fonte</th></tr></thead><tbody id="tb-composicoes"><tr><td colspan="5" class="text-center text-muted" style="padding:32px">Carregando...</td></tr></tbody></table></div></div></div></div>
     <div class="page" id="page-provisoes"><div class="card"><div class="card-header"><span class="font-bold">Provisões</span></div><div class="card-body"><div class="empty-state"><div class="es-icon">🔒</div><h3>Provisões</h3><p>Trabalhistas, tributárias e marketing.<br>Em breve disponível.</p></div></div></div></div>
     <div class="page" id="page-relatorios"><div class="card"><div class="card-header"><span class="font-bold">Relatórios</span></div><div class="card-body"><div class="empty-state"><div class="es-icon">📈</div><h3>Relatórios</h3><p>DRE por obra, fluxo de caixa, comparativo.<br>Em breve disponível.</p></div></div></div></div>
-    <div class="page" id="page-configuracoes"><div class="card"><div class="card-header"><span class="font-bold">Configurações</span></div><div class="card-body" id="cfg-body"></div></div></div>
+    <div class="page" id="page-configuracoes">
+      <div class="card" style="max-width:600px">
+        <div class="card-header"><span class="font-bold">⚙️ Configurações do Sistema</span></div>
+        <div class="card-body">
+          <div style="margin-bottom:24px">
+            <div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--gray-200)">🔌 Conexão com Banco de Dados</div>
+            <div class="form-group"><label class="form-label">Supabase URL</label>
+              <input class="form-input" id="cfg-url" type="text" placeholder="https://xxxx.supabase.co"/></div>
+            <div class="form-group"><label class="form-label">Anon Key (Settings → API → anon public)</label>
+              <input class="form-input" id="cfg-key" type="password" placeholder="Cole aqui a chave anon public"/>
+              <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Supabase Dashboard → Settings → API → anon public</div></div>
+            <button class="btn btn-orange" onclick="saveConfig()">💾 Salvar Configuração</button>
+          </div>
+          <div id="cfg-conn-status" style="margin-top:8px"></div>
+        </div>
+      </div>
+    </div>
   </div></main>
 </div>
 
@@ -534,22 +542,30 @@ function saveConfig(){
   const url = document.getElementById('cfg-url').value.trim()
   const key = document.getElementById('cfg-key').value.trim()
   if(!url || !key){ toast('⚠️ Preencha URL e Anon Key','red'); return }
+  if(!url.startsWith('https://') || !url.includes('supabase.co')){
+    toast('⚠️ URL inválida. Deve ser https://xxxx.supabase.co','red'); return
+  }
   localStorage.setItem('sb_url', url)
   localStorage.setItem('sb_key', key)
   supabase_client = supabase.createClient(url, key)
-  toast('✅ Configuração salva! Faça login agora.','green')
+  document.getElementById('setup-banner').style.display = 'none'
+  const st = document.getElementById('cfg-conn-status')
+  if(st) st.innerHTML = '<div class="alert alert-green">✅ Configuração salva com sucesso! Faça login agora.</div>'
+  toast('✅ Configuração salva!','green')
 }
 
 // Carrega configuração salva
 window.addEventListener('load', ()=>{
   const url = localStorage.getItem('sb_url')
   const key = localStorage.getItem('sb_key')
-  if(url) document.getElementById('cfg-url').value = url
-  if(key) document.getElementById('cfg-key').value = key
+  // Só mostra banner de setup se não tiver configuração
+  if(!url || !key){
+    document.getElementById('setup-banner').style.display = 'block'
+  }
   if(url && key){ initSupabase(); checkSession() }
   // Define data de hoje nos inputs de data
   const hoje = new Date().toISOString().split('T')[0]
-  document.querySelectorAll('input[type=date]').forEach(el=>el.value=hoje)
+  document.querySelectorAll('input[type=date]').forEach(el=>{ if(el.type==='date') el.value=hoje })
 })
 
 async function checkSession(){
@@ -776,22 +792,19 @@ async function loadFinanceiro(){
     </div>`).join('')+'</div>'
 }
 function loadConfig(){
-  document.getElementById('cfg-body').innerHTML = `
-    <div style="max-width:480px">
-      <div style="font-weight:800;margin-bottom:16px;font-size:15px">⚙️ Conexão com Supabase</div>
-      <div class="form-group"><label class="form-label">Supabase URL</label>
-        <input class="form-input" id="cfg2-url" value="${localStorage.getItem('sb_url')||''}"/></div>
-      <div class="form-group"><label class="form-label">Anon Key</label>
-        <input class="form-input" id="cfg2-key" value="${localStorage.getItem('sb_key')||''}"/></div>
-      <button class="btn btn-orange" onclick="saveConfig2()">💾 Salvar</button>
-    </div>`
-}
-function saveConfig2(){
-  const url = document.getElementById('cfg2-url').value.trim()
-  const key = document.getElementById('cfg2-key').value.trim()
-  localStorage.setItem('sb_url',url); localStorage.setItem('sb_key',key)
-  supabase_client = supabase.createClient(url,key)
-  toast('✅ Configuração atualizada!','green')
+  // Preenche os campos com valores salvos (mascarados)
+  const url = localStorage.getItem('sb_url')||''
+  const key = localStorage.getItem('sb_key')||''
+  const cfgUrl = document.getElementById('cfg-url')
+  const cfgKey = document.getElementById('cfg-key')
+  if(cfgUrl) cfgUrl.value = url
+  if(cfgKey) cfgKey.value = key
+  const st = document.getElementById('cfg-conn-status')
+  if(st && url && key){
+    st.innerHTML = `<div class="alert alert-green">✅ Conectado: <strong>${url.replace('https://','').split('.')[0]}...supabase.co</strong></div>`
+  } else if(st){
+    st.innerHTML = '<div class="alert alert-orange">⚠️ Sem configuração. Preencha os campos acima.</div>'
+  }
 }
 
 // ── SAVES ─────────────────────────────────────────────────
